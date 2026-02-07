@@ -1,75 +1,68 @@
-﻿<!DOCTYPE html>
+<!doctype html>
 <html>
-<head>
-	<meta charset="utf-8" />
-	<title>Landing Page</title>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Landing Page</title>
 
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <link rel="stylesheet" href="styles.css" />
 
-	<link rel="stylesheet" href="styles.css">
+    <script>
+      function TestButtonHandler() {
+        var webMethod = "ProjectServices.asmx/TestConnection";
 
-	<script type="text/javascript">
-		function TestButtonHandler() {
-			var webMethod = "ProjectServices.asmx/TestConnection";
-			var parameters = "{}";
+        $.ajax({
+          type: "POST",
+          url: webMethod,
+          data: "{}",
+          contentType: "application/json; charset=utf-8",
+          dataType: "json",
+          success: function (msg) {
+            alert(msg.d);
+          },
+          error: function (xhr, status, err) {
+            console.log("AJAX error:", status, err, xhr.responseText);
+            alert("Unable to reach web service");
+          },
+        });
+      }
 
-			$.ajax({
-				type: "POST",
-				url: webMethod,
-				data: parameters,
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				success: function (msg) {
-					alert(msg.d);
-				},
-				error: function () {
-					alert("Unable to reach web service");
-				}
-			});
-		}
+      function goToLogin() {
+        window.location.href = "login.html";
+      }
+    </script>
+  </head>
 
-		function goToLogin() {
-			window.location.href = "login.html";
-		}
-	</script>
-</head>
+  <body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad Project</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+      </div>
+    </div>
 
-<body>
-	<body>
+    <!-- MAIN CONTENT -->
+    <div class="main-content">
+      <div class="card">
+        <h1>Welcome to the Scrum Squad Project</h1>
+        <p>
+          A simple, secure platform built for collaboration and collecting
+          feedback. Log in to continue or verify the system connection.
+        </p>
 
-	<!-- NAVBAR -->
-	<div class="navbar">
-		<div class="navbar-title">Scrum Squad Project</div>
-		<div class="navbar-links">
-			<a href="index.html">Home</a>
-			<a href="about.html">About</a>
-			<a href="login.html">Login</a>
-			<a href="feed.html">Feed</a>
-		</div>
-	</div>
+        <button class="primary-btn" onclick="goToLogin()">Get Started</button>
+        <button class="secondary-btn" onclick="TestButtonHandler()">
+          Test Connection
+        </button>
+      </div>
+    </div>
 
-	<!-- MAIN CONTENT -->
-	<div class="main-content">
-		<div class="card">
-			<h1>Welcome to the Scrum Squad Project</h1>
-			<p>
-				A simple, secure platform built for collaboration and collecting feedback.
-				Log in to continue or verify the system connection.
-			</p>
-
-			<h1></h1>
-
-			<button class="primary-btn" onclick="goToLogin()">Get Started</button>
-			<button class="secondary-btn" onclick="TestButtonHandler()">Test Connection</button>
-		</div>
-	</div>
-
-	<!-- FOOTER -->
-	<div class="footer">
-		© 2026 Scrum Squad Project. All rights reserved.
-	</div>
-
-</body>
-
-</body>
+    <!-- FOOTER -->
+    <div class="footer">© 2026 Scrum Squad Project. All rights reserved.</div>
+  </body>
 </html>
