@@ -1,52 +1,91 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>All Updates | Scrum Squad</title>
-  <link rel="stylesheet" href="styles.css" />
-</head>
-<body>
-  <div class="navbar">
-    <div class="navbar-title">Scrum Squad</div>
-    <div class="navbar-links">
-      <a href="index.html">Home</a>
-      <a href="about.html">About</a>
-      <a href="login.html">Login</a>
-      <a href="feed.html">Feed</a>
-      <a href="updates.html">Updates</a>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>All Updates | Scrum Squad</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body>
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+        <a href="updates.html">Updates</a>
+      </div>
     </div>
-  </div>
-  <main class="main-content">
-    <div class="card">
-      <h1>All Updates</h1>
-      <div id="allUpdatesList">Loading...</div>
-    </div>
-  </main>
-  <script>
-    async function loadAllUpdates() {
-      const res = await fetch("../ProjectServices.asmx/GetAllUpdates", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: "{}"
-      });
-      const data = await res.json();
-      const updates = data.d || [];
-      const container = document.getElementById("allUpdatesList");
-      if (!updates.length) {
-        container.innerHTML = '<div class="no-updates">No updates yet.</div>';
-        return;
+
+    <main class="main-content">
+      <div class="card">
+        <h1>All Updates</h1>
+        <div id="allUpdatesList">Loading...</div>
+      </div>
+    </main>
+
+    <!-- Notification system -->
+    <script src="JavaScript/notificationService.js"></script>
+
+    <script>
+      async function loadAllUpdates() {
+        try {
+          const res = await fetch("../ProjectServices.asmx/GetAllUpdates", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: "{}",
+          });
+
+          const data = await res.json();
+          const updates = data.d || [];
+          const container = document.getElementById("allUpdatesList");
+
+          if (!updates.length) {
+            container.innerHTML =
+              '<div class="no-updates">No updates yet.</div>';
+
+            if (window.NotificationService) {
+              NotificationService.info("No updates yet.");
+            }
+            return;
+          }
+
+          container.innerHTML = "";
+          updates.forEach((u) => {
+            const div = document.createElement("div");
+            div.className = "feedback-update";
+            div.innerHTML = `
+              <div class="update-meta">
+                <strong>${u.authorRole}</strong>
+                <span>${new Date(u.timestamp).toLocaleString()}</span>
+              </div>
+              <div class="update-text">${u.content}</div>
+              <div class="update-post">Post ID: ${u.postId}</div>
+            `;
+            container.appendChild(div);
+          });
+
+          // Notify when updates load successfully
+          if (window.NotificationService) {
+            NotificationService.success("Updates loaded.");
+          }
+        } catch (err) {
+          console.error(err);
+          document.getElementById("allUpdatesList").innerHTML =
+            '<div class="no-updates">Unable to load updates.</div>';
+
+          if (window.NotificationService) {
+            NotificationService.error(
+              "Unable to load updates. Please try again.",
+            );
+          }
+        }
       }
-      container.innerHTML = '';
-      updates.forEach(u => {
-        const div = document.createElement('div');
-        div.className = 'feedback-update';
-        div.innerHTML = `<div class="update-meta"><strong>${u.authorRole}</strong> <span>${new Date(u.timestamp).toLocaleString()}</span></div><div class="update-text">${u.content}</div><div class="update-post">Post ID: ${u.postId}</div>`;
-        container.appendChild(div);
-      });
-    }
-    loadAllUpdates();
-  </script>
-</body>
+
+      loadAllUpdates();
+    </script>
+  </body>
 </html>

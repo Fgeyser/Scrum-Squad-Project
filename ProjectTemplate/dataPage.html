@@ -1,225 +1,298 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Aggregated Report - Scrum Squad</title>
-  <link rel="stylesheet" href="styles.css" />
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-</head>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Aggregated Report - Scrum Squad</title>
+    <link rel="stylesheet" href="styles.css" />
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  </head>
 
-<body>
-
-<!-- NAVBAR -->
-<div class="navbar">
-  <div class="navbar-title">Scrum Squad</div>
-  <div class="navbar-links">
-    <a href="index.html">Home</a>
-    <a href="about.html">About</a>
-    <a href="login.html">Login</a>
-    <a href="feed.html">Feed</a>
-    <a href="dataPage.html">Data</a>
-  </div>
-</div>
-
-<!-- MAIN CONTENT -->
-<main class="main-content">
-  <div class="card">
-    <h1>Aggregated Report</h1>
-    <p>View and download aggregated feedback data.</p>
-
-    <h1></h1>
-    
-    <button class="primary-btn" onclick="loadReport()">Load Aggregated Data</button>
-
-    <h1></h1>
-
-    <div id="reportContainer" style="display: none;">
-      <h2>Report Summary</h2>
-      <p id="totalCount"></p>
-
-      <div style="margin: 2rem 0;">
-        <label for="chartType">Chart Type:</label>
-        <select id="chartType" onchange="updateChart()">
-          <option value="postsOverTime">Posts Over Time</option>
-          <option value="categories">Category Usage</option>
-        </select>
-      </div>
-
-      <canvas id="reportChart" width="400" height="200"></canvas>
-
-      <div id="dataTable" style="margin: 2rem 0;">
-        <h3>Data Table</h3>
-        <table border="1" style="width: 100%; border-collapse: collapse;">
-          <thead>
-            <tr id="tableHeader"></tr>
-          </thead>
-          <tbody id="tableBody"></tbody>
-        </table>
-      </div>
-
-      <div style="margin: 2rem 0;">
-        <button class="secondary-btn" onclick="downloadCSV()">Download CSV</button>
-        <button class="secondary-btn" onclick="downloadJSON()">Download JSON</button>
-        <button class="secondary-btn" onclick="downloadTXT()">Download TXT</button>
+  <body>
+    <!-- NAVBAR -->
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+        <a href="dataPage.html">Data</a>
       </div>
     </div>
-  </div>
-</main>
 
-<script>
-let reportData = null;
-let chart = null;
+    <!-- MAIN CONTENT -->
+    <main class="main-content">
+      <div class="card">
+        <h1>Aggregated Report</h1>
+        <p>View and download aggregated feedback data.</p>
 
-async function loadReport() {
-  try {
-    // Check if user is logged in and is admin
-    const whoamiRes = await fetch('/api/whoami', { credentials: 'include' });
-    const whoamiData = await whoamiRes.json();
-    if (!whoamiData.ok || !whoamiData.user || !whoamiData.user.isAdmin) {
-      alert('Access denied. You must be logged in as an admin to view this report.');
-      return;
-    }
+        <button class="primary-btn" onclick="loadReport()">
+          Load Aggregated Data
+        </button>
 
-    // Fetch aggregated report
-    const reportRes = await fetch('/api/aggregated-report', { credentials: 'include' });
-    if (!reportRes.ok) {
-      throw new Error('Failed to load report');
-    }
-    reportData = await reportRes.json();
-    displayReport();
-    updateChart();
-    document.getElementById('reportContainer').style.display = 'block';
-  } catch (error) {
-    console.error('Error loading report:', error);
-    alert('Unable to load report. Please try again.');
-  }
-}
+        <div id="reportContainer" style="display: none; margin-top: 1.5rem">
+          <h2>Report Summary</h2>
+          <p id="totalCount"></p>
 
+          <div style="margin: 2rem 0">
+            <label for="chartType">Chart Type:</label>
+            <select id="chartType" onchange="updateChart()">
+              <option value="postsOverTime">Posts Over Time</option>
+              <option value="categories">Category Usage</option>
+            </select>
+          </div>
 
-function displayReport() {
-  document.getElementById('totalCount').textContent = `Total Feedback Posts: ${reportData.TotalCount}`;
-}
+          <canvas id="reportChart" width="400" height="200"></canvas>
 
-function updateChart() {
-  const ctx = document.getElementById('reportChart').getContext('2d');
-  const chartType = document.getElementById('chartType').value;
+          <div id="dataTable" style="margin: 2rem 0">
+            <h3>Data Table</h3>
+            <table border="1" style="width: 100%; border-collapse: collapse">
+              <thead>
+                <tr id="tableHeader"></tr>
+              </thead>
+              <tbody id="tableBody"></tbody>
+            </table>
+          </div>
 
-  if (chart) {
-    chart.destroy();
-  }
+          <div style="margin: 2rem 0">
+            <button class="secondary-btn" onclick="downloadCSV()">
+              Download CSV
+            </button>
+            <button class="secondary-btn" onclick="downloadJSON()">
+              Download JSON
+            </button>
+            <button class="secondary-btn" onclick="downloadTXT()">
+              Download TXT
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
 
-  let data, labels, title;
+    <!-- FOOTER -->
+    <div class="footer">
+      © 2026 Scrum Squad Project Team. All rights reserved.
+    </div>
 
-  if (chartType === 'postsOverTime') {
-    labels = reportData.CountsPerDay.map(item => item.Key);
-    data = reportData.CountsPerDay.map(item => item.Count);
-    title = 'Posts Over Time';
-  } else {
-    labels = reportData.CountsPerTheme.map(item => item.Key);
-    data = reportData.CountsPerTheme.map(item => item.Count);
-    title = 'Category Usage';
-  }
+    <!-- SCRIPTS -->
+    <script src="JavaScript/notificationService.js"></script>
 
-  chart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: labels,
-      datasets: [{
-        label: title,
-        data: data,
-        backgroundColor: 'rgba(3, 64, 120, 0.6)',
-        borderColor: 'rgba(3, 64, 120, 1)',
-        borderWidth: 1
-      }]
-    },
-    options: {
-      scales: {
-        y: {
-          beginAtZero: true
+    <script>
+      let reportData = null;
+      let chart = null;
+
+      // Optional page-load notification
+      document.addEventListener("DOMContentLoaded", () => {
+        if (window.NotificationService) {
+          NotificationService.info(
+            "Data page ready. Admins can load the aggregated report.",
+          );
+        }
+      });
+
+      async function loadReport() {
+        try {
+          if (window.NotificationService) {
+            NotificationService.info("Loading aggregated report...");
+          }
+
+          // Check if user is logged in and is admin
+          const whoamiRes = await fetch("/api/whoami", {
+            credentials: "include",
+          });
+          const whoamiData = await whoamiRes.json();
+
+          if (!whoamiData.ok || !whoamiData.user || !whoamiData.user.isAdmin) {
+            if (window.NotificationService) {
+              NotificationService.error(
+                "Access denied. You must be logged in as an admin to view this report.",
+                "login.html",
+              );
+            } else {
+              alert(
+                "Access denied. You must be logged in as an admin to view this report.",
+              );
+            }
+            return;
+          }
+
+          // Fetch aggregated report
+          const reportRes = await fetch("/api/aggregated-report", {
+            credentials: "include",
+          });
+          if (!reportRes.ok) throw new Error("Failed to load report");
+
+          reportData = await reportRes.json();
+
+          displayReport();
+          updateChart();
+          document.getElementById("reportContainer").style.display = "block";
+
+          if (window.NotificationService) {
+            NotificationService.success("Aggregated report loaded!");
+          }
+        } catch (error) {
+          console.error("Error loading report:", error);
+
+          if (window.NotificationService) {
+            NotificationService.error(
+              "Unable to load report. Please try again.",
+            );
+          } else {
+            alert("Unable to load report. Please try again.");
+          }
         }
       }
-    }
-  });
 
-  // Update table
-  updateTable(chartType);
-}
+      function displayReport() {
+        document.getElementById("totalCount").textContent =
+          `Total Feedback Posts: ${reportData.TotalCount}`;
+      }
 
-function updateTable(chartType) {
-  const header = document.getElementById('tableHeader');
-  const body = document.getElementById('tableBody');
+      function updateChart() {
+        if (!reportData) return;
 
-  let items;
-  if (chartType === 'postsOverTime') {
-    header.innerHTML = '<th>Date</th><th>Count</th>';
-    items = reportData.CountsPerDay;
-  } else {
-    header.innerHTML = '<th>Category</th><th>Count</th>';
-    items = reportData.CountsPerTheme;
-  }
+        const ctx = document.getElementById("reportChart").getContext("2d");
+        const chartType = document.getElementById("chartType").value;
 
-  body.innerHTML = '';
-  items.forEach(item => {
-    const row = document.createElement('tr');
-    row.innerHTML = `<td>${item.Key}</td><td>${item.Count}</td>`;
-    body.appendChild(row);
-  });
-}
+        if (chart) chart.destroy();
 
-function downloadCSV() {
-  if (!reportData) return;
+        let data, labels, title;
 
-  let csv = 'Date,Count\n';
-  reportData.CountsPerDay.forEach(item => {
-    csv += `${item.Key},${item.Count}\n`;
-  });
+        if (chartType === "postsOverTime") {
+          labels = reportData.CountsPerDay.map((item) => item.Key);
+          data = reportData.CountsPerDay.map((item) => item.Count);
+          title = "Posts Over Time";
+        } else {
+          labels = reportData.CountsPerTheme.map((item) => item.Key);
+          data = reportData.CountsPerTheme.map((item) => item.Count);
+          title = "Category Usage";
+        }
 
-  const blob = new Blob([csv], { type: 'text/csv' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'aggregated_report.csv';
-  a.click();
-  window.URL.revokeObjectURL(url);
-}
+        chart = new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              {
+                label: title,
+                data: data,
+                backgroundColor: "rgba(3, 64, 120, 0.6)",
+                borderColor: "rgba(3, 64, 120, 1)",
+                borderWidth: 1,
+              },
+            ],
+          },
+          options: {
+            scales: { y: { beginAtZero: true } },
+          },
+        });
 
-function downloadJSON() {
-  if (!reportData) return;
+        updateTable(chartType);
 
-  const json = JSON.stringify(reportData, null, 2);
-  const blob = new Blob([json], { type: 'application/json' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'aggregated_report.json';
-  a.click();
-  window.URL.revokeObjectURL(url);
-}
+        if (window.NotificationService) {
+          const msg =
+            chartType === "postsOverTime"
+              ? "Showing posts over time."
+              : "Showing category usage.";
+          NotificationService.info(msg);
+        }
+      }
 
-function downloadTXT() {
-  // Simple txt generation
-  if (!reportData) return;
+      function updateTable(chartType) {
+        const header = document.getElementById("tableHeader");
+        const body = document.getElementById("tableBody");
 
-  let text = `Aggregated Report\n\nTotal Feedback Posts: ${reportData.TotalCount}\n\nPosts Over Time:\n`;
-  reportData.CountsPerDay.forEach(item => {
-    text += `${item.Key}: ${item.Count}\n`;
-  });
-  text += '\nCategory Usage:\n';
-  reportData.CountsPerTheme.forEach(item => {
-    text += `${item.Key}: ${item.Count}\n`;
-  });
+        let items;
+        if (chartType === "postsOverTime") {
+          header.innerHTML = "<th>Date</th><th>Count</th>";
+          items = reportData.CountsPerDay;
+        } else {
+          header.innerHTML = "<th>Category</th><th>Count</th>";
+          items = reportData.CountsPerTheme;
+        }
 
-  const blob = new Blob([text], { type: 'text/plain' });
-  const url = window.URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = 'aggregated_report.txt'; 
-  a.click();
-  window.URL.revokeObjectURL(url);
-}
-</script>
+        body.innerHTML = "";
+        items.forEach((item) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td>${item.Key}</td><td>${item.Count}</td>`;
+          body.appendChild(row);
+        });
+      }
 
-</body>
+      function downloadCSV() {
+        if (!reportData) {
+          if (window.NotificationService)
+            NotificationService.error("Load the report first.");
+          return;
+        }
+
+        let csv = "Date,Count\n";
+        reportData.CountsPerDay.forEach((item) => {
+          csv += `${item.Key},${item.Count}\n`;
+        });
+
+        const blob = new Blob([csv], { type: "text/csv" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "aggregated_report.csv";
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        if (window.NotificationService)
+          NotificationService.success("CSV downloaded!");
+      }
+
+      function downloadJSON() {
+        if (!reportData) {
+          if (window.NotificationService)
+            NotificationService.error("Load the report first.");
+          return;
+        }
+
+        const json = JSON.stringify(reportData, null, 2);
+        const blob = new Blob([json], { type: "application/json" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "aggregated_report.json";
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        if (window.NotificationService)
+          NotificationService.success("JSON downloaded!");
+      }
+
+      function downloadTXT() {
+        if (!reportData) {
+          if (window.NotificationService)
+            NotificationService.error("Load the report first.");
+          return;
+        }
+
+        let text = `Aggregated Report\n\nTotal Feedback Posts: ${reportData.TotalCount}\n\nPosts Over Time:\n`;
+        reportData.CountsPerDay.forEach((item) => {
+          text += `${item.Key}: ${item.Count}\n`;
+        });
+        text += "\nCategory Usage:\n";
+        reportData.CountsPerTheme.forEach((item) => {
+          text += `${item.Key}: ${item.Count}\n`;
+        });
+
+        const blob = new Blob([text], { type: "text/plain" });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = "aggregated_report.txt";
+        a.click();
+        window.URL.revokeObjectURL(url);
+
+        if (window.NotificationService)
+          NotificationService.success("TXT downloaded!");
+      }
+    </script>
+  </body>
 </html>
