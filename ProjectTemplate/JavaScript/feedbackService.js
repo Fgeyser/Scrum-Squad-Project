@@ -1,5 +1,7 @@
 // Data access layer (local + API)
 const LOCAL_STORAGE_KEY = "scrum_squad_feedback";
+// Match the mock backend port used by the demo server
+const API_BASE = (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : 'http://localhost:8001';
 
 // Local helpers
 
@@ -38,52 +40,28 @@ const FeedbackService = {
   // Get all feedback (API first, local fallback)
   async getAll() {
     try {
-      const res = await fetch("/api/feedback", { credentials: "include" });
+      const res = await fetch(API_BASE + "/api/feedback", { credentials: 'include' });
       if (!res.ok) throw new Error("API unavailable");
       return await res.json();
-    } catch {
+    } catch (err) {
+      console.warn('Falling back to local feedback due to:', err && err.message);
       return loadLocalFeedback();
-    }
-  },
-
-  // Get updates for a post
-  async getUpdates(postId) {
-    // Try production ASMX endpoint first
-    try {
-      const res = await fetch('ProjectServices.asmx/GetUpdatesForPost', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify({ postId })
-      });
-      if (res.ok) {
-        const data = await res.json().catch(() => ({}));
-        return data.d || [];
-      }
-    } catch (e) {
-      // fall through to mock
-    }
-
-    try {
-      const res2 = await fetch(`/api/feedback/${encodeURIComponent(postId)}/updates`, { credentials: 'include' });
-      if (!res2.ok) return [];
-      return await res2.json();
-    } catch {
-      return [];
     }
   },
 
   // Create new feedback
   async create(feedback) {
     try {
-      await fetch("/api/feedback", {
+      await fetch(API_BASE + "/api/feedback", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        credentials: "include",
+        credentials: 'include',
         body: JSON.stringify(feedback)
       });
-    } catch {
+    } catch (err) {
+      console.warn('POST /api/feedback failed, falling back to local. Error:', err && err.message);
       const list = loadLocalFeedback();
+
       list.unshift({
         id: Date.now(),
         issue: feedback.issue,
@@ -93,6 +71,7 @@ const FeedbackService = {
         createdAt: new Date().toISOString(),
         upvotes: 0
       });
+
       saveLocalFeedback(list);
     }
   },
@@ -100,37 +79,10 @@ const FeedbackService = {
   // Toggle upvote / un-upvote
   async toggleUpvote(id) {
     try {
-      await fetch(`/api/feedback/${id}/upvote`, { method: "POST", credentials: "include" });
-    } catch {
+      await fetch(API_BASE + `/api/feedback/${id}/upvote`, { method: "POST", credentials: 'include' });
+    } catch (err) {
+      console.warn('Upvote API failed, using local toggle. Error:', err && err.message);
       toggleLocalUpvote(id);
-    }
-  },
-
-  // Update feedback
-  async addUpdate(feedbackId, text) {
-    try {
-      await fetch(`/api/feedback/${feedbackId}/update`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: "include",
-        body: JSON.stringify({ text })
-      });
-    } catch {
-      const list = loadLocalFeedback();
-      const item = list.find(f => f.id === feedbackId || String(f.id) === String(feedbackId));
-      if (item) {
-        item.updates = item.updates || [];
-        item.updates.unshift({
-          id: Date.now(),
-          text,
-          createdAt: new Date().toISOString()
-        });
-        saveLocalFeedback(list);
-      }
     }
   }
 };
-
-// expose it if module pattern in file uses an object
-// if file attaches functions to a global `feedbackService`, add:
-// feedbackService.addUpdate = addUpdate;
