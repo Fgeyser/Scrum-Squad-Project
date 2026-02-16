@@ -5,7 +5,9 @@
     "displayName": "Employee One",
     "publicId": "user-kfiagi",
     "role": "employee",
-    "points": 6
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
   },
   {
     "username": "alice",
@@ -13,7 +15,9 @@
     "displayName": "Alice Example",
     "publicId": "user-d9nmq4",
     "role": "employee",
-    "points": 0
+    "points": 6,
+    "earnedPoints": 6,
+    "spentPoints": 0
   },
   {
     "username": "admin",
@@ -21,6 +25,118 @@
     "displayName": "Admin User",
     "publicId": "user-admin",
     "role": "admin",
-    "points": 0
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "Sam",
+    "password": "sulek123",
+    "displayName": "Sam",
+    "publicId": "user-gjgepf",
+    "isAdmin": false,
+    "points": 1,
+    "earnedPoints": 6,
+    "spentPoints": 5
+  },
+  {
+    "username": "u_owner_1771212050",
+    "password": "pass123",
+    "displayName": "Owner",
+    "publicId": "user-ckf3kf",
+    "isAdmin": false,
+    "points": 12,
+    "earnedPoints": 12,
+    "spentPoints": 0
+  },
+  {
+    "username": "u_a1_1771212050",
+    "password": "pass123",
+    "displayName": "Actor One",
+    "publicId": "user-azplnj",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "u_a2_1771212050",
+    "password": "pass123",
+    "displayName": "Actor Two",
+    "publicId": "user-knatse",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "Kevin",
+    "password": "kevin123",
+    "displayName": "Kevin",
+    "publicId": "user-1e83ei",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "gg",
+    "password": "gggggg",
+    "displayName": "gg",
+    "publicId": "user-suvllq",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "owner_1771213389",
+    "password": "pass123",
+    "displayName": "Owner",
+    "publicId": "user-ang4go",
+    "isAdmin": false,
+    "points": 6,
+    "earnedPoints": 6,
+    "spentPoints": 0
+  },
+  {
+    "username": "alpha_1771213389",
+    "password": "pass123",
+    "displayName": "Alpha",
+    "publicId": "user-f3mqfo",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "beta_1771213389",
+    "password": "pass123",
+    "displayName": "Beta",
+    "publicId": "user-z8745d",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "shop_owner_1771214599",
+    "password": "pass123",
+    "displayName": "Shop Owner",
+    "publicId": "user-tbahsf",
+    "isAdmin": false,
+    "points": 1,
+    "earnedPoints": 6,
+    "spentPoints": 5
+  },
+  {
+    "username": "shop_actor_1771214599",
+    "password": "pass123",
+    "displayName": "Shop Actor",
+    "publicId": "user-czi64o",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
   }
 ]
