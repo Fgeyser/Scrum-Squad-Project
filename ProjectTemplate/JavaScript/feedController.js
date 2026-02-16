@@ -1,170 +1,164 @@
 let feedbackList = [];
-let currentSort = "recent";
+let currentSort = 'recent';
 let currentUser = null;
 
-document.addEventListener("DOMContentLoaded", initFeed);
+function setPointsHeader(pointsData) {
+  const pointsEl = document.getElementById('pointsValue');
+  const pointsRulesEl = document.getElementById('pointsRules');
+  if (!pointsEl || !pointsRulesEl) return;
 
-async function initFeed() {
-  const feed = document.getElementById("feedList");
-
-  // Get current user
-  try {
-    const res = await fetch("/api/whoami", { credentials: "include" });
-    const data = await res.json();
-    currentUser = data.ok ? data.user : null;
-
-    if (window.NotificationService) {
-      if (currentUser) {
-        NotificationService.info(
-          `Welcome back, ${currentUser.displayName || currentUser.username || "User"}!`,
-        );
-      } else {
-        NotificationService.info(
-          "Viewing feed as guest. Log in to interact more.",
-        );
-      }
-    }
-  } catch {
-    currentUser = null;
-    if (window.NotificationService) {
-      NotificationService.error(
-        "Could not check login status. You may be in guest mode.",
-      );
-    }
+  if (!pointsData) {
+    pointsEl.textContent = '0';
+    pointsRulesEl.textContent = `On your posts: +3 comment, +2 upvote, +1 like`;
+    return;
   }
 
-  // Show empty state immediately
-  renderFeed(feed, [], handleUpvote, currentUser);
-
-  try {
-    feedbackList = await FeedbackService.getAll();
-    render();
-
-    if (window.NotificationService) {
-      NotificationService.success("Feed loaded!");
-    }
-  } catch (err) {
-    // If the feed fails to load, keep empty render but notify
-    if (window.NotificationService) {
-      NotificationService.error(
-        "Could not load the feed. Please refresh and try again.",
-      );
-    }
-  }
-}
-
-function render() {
-  const feed = document.getElementById("feedList");
-  renderFeed(feed, getSortedFeedback(), handleUpvote, currentUser);
+  pointsEl.textContent = String(pointsData.points || 0);
+  const rules = pointsData.rules || { comment: 3, upvote: 2, like: 1 };
+  pointsRulesEl.textContent = `On your posts: +${rules.comment} comment, +${rules.upvote} upvote, +${rules.like} like`;
 }
 
 function getSortedFeedback() {
   const list = [...feedbackList];
-
-  if (currentSort === "upvotes") {
-    return list.sort((a, b) => b.upvotes - a.upvotes);
-  }
-
-  if (currentSort === "date") {
-    return list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
-  }
-
+  if (currentSort === 'upvotes') return list.sort((a, b) => (b.upvotes || 0) - (a.upvotes || 0));
+  if (currentSort === 'date') return list.sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
   return list.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
+function render() {
+  const feed = document.getElementById('feedList');
+  renderFeed(feed, getSortedFeedback(), {
+    onUpvote: handleUpvote,
+    onLike: handleLike,
+    onComment: handleComment,
+    onLoadComments: loadComments,
+    onLoadUpdates: loadUpdates
+  }, currentUser);
+}
+
 function changeSort() {
-  currentSort = document.getElementById("sortSelect").value;
+  currentSort = document.getElementById('sortSelect').value;
+  render();
+}
 
-  if (window.NotificationService) {
-    const label =
-      currentSort === "recent"
-        ? "Most Recent"
-        : currentSort === "upvotes"
-          ? "Most Upvoted"
-          : "Oldest First";
-    NotificationService.info(`Sorting by: ${label}`);
+async function refreshPoints() {
+  if (!currentUser) {
+    setPointsHeader(null);
+    return;
   }
+  try {
+    const points = await FeedbackService.getMyPoints();
+    setPointsHeader(points);
+  } catch (err) {
+    setPointsHeader(null);
+  }
+}
 
+async function loadFeed() {
+  feedbackList = await FeedbackService.getAll();
   render();
 }
 
 async function handleUpvote(id) {
   try {
     await FeedbackService.toggleUpvote(id);
-
-    if (window.NotificationService) {
-      NotificationService.success("Upvote saved!");
-    }
-
-    feedbackList = await FeedbackService.getAll();
-    render();
+    await Promise.all([loadFeed(), refreshPoints()]);
+    if (window.NotificationService) NotificationService.success('Upvote saved!');
   } catch (err) {
-    if (window.NotificationService) {
-      NotificationService.error("Could not save upvote. Please try again.");
-    }
+    if (window.NotificationService) NotificationService.error(err.message || 'Could not save upvote.');
+  }
+}
+
+async function handleLike(id) {
+  try {
+    await FeedbackService.toggleLike(id);
+    await Promise.all([loadFeed(), refreshPoints()]);
+    if (window.NotificationService) NotificationService.success('Like saved!');
+  } catch (err) {
+    if (window.NotificationService) NotificationService.error(err.message || 'Could not save like.');
+  }
+}
+
+async function loadComments(id) {
+  try {
+    return await FeedbackService.getComments(id);
+  } catch (err) {
+    return [];
+  }
+}
+
+async function handleComment(id, text) {
+  try {
+    await FeedbackService.addComment(id, text);
+    await Promise.all([loadFeed(), refreshPoints()]);
+    if (window.NotificationService) NotificationService.success('Comment posted!');
+  } catch (err) {
+    if (window.NotificationService) NotificationService.error(err.message || 'Could not post comment.');
+  }
+}
+
+async function loadUpdates(id) {
+  try {
+    return await FeedbackService.getUpdates(id);
+  } catch (err) {
+    return [];
   }
 }
 
 async function submitFeedback() {
-  const issue = document.getElementById("issue").value.trim();
-  const impact = document.getElementById("impact").value.trim();
-  const suggestion = document.getElementById("suggestion").value.trim();
-  const theme = document.getElementById("theme").value;
+  const issue = document.getElementById('issue').value.trim();
+  const impact = document.getElementById('impact').value.trim();
+  const suggestion = document.getElementById('suggestion').value.trim();
+  const theme = document.getElementById('theme').value;
 
   if (!issue || !impact || !suggestion) {
-    if (window.NotificationService) {
-      NotificationService.error(
-        "Please fill out Issue, Impact, and Suggestion before posting.",
-      );
-    }
+    if (window.NotificationService) NotificationService.error('Please fill issue, impact and suggestion.');
     return;
   }
 
-  // Optimistic UI item (temporary)
-  const tempId = "temp_" + Date.now();
-  const newPost = {
-    id: tempId,
-    issue,
-    impact,
-    suggestion,
-    theme,
-    upvotes: 0,
-    createdAt: new Date().toISOString(),
-    temp: true,
-  };
-
-  // Optimistic UI
-  feedbackList.unshift(newPost);
-  render();
-  closeModal();
-
   try {
-    // Persist
     await FeedbackService.create({ issue, impact, suggestion, theme });
-
-    if (window.NotificationService) {
-      NotificationService.success("Feedback posted. Thanks for sharing!");
-    }
-
-    // Refresh from server so IDs/upvotes are real
-    feedbackList = await FeedbackService.getAll();
-    render();
+    closeModal();
+    document.getElementById('issue').value = '';
+    document.getElementById('impact').value = '';
+    document.getElementById('suggestion').value = '';
+    await Promise.all([loadFeed(), refreshPoints()]);
+    if (window.NotificationService) NotificationService.success('Feedback posted!');
   } catch (err) {
-    // Rollback optimistic post if save fails
-    feedbackList = feedbackList.filter((p) => p.id !== tempId);
-    render();
-
-    if (window.NotificationService) {
-      NotificationService.error("Could not post feedback. Please try again.");
-    }
+    if (window.NotificationService) NotificationService.error(err.message || 'Could not post feedback.');
   }
 }
 
-// Modal helpers (UI only)
 function openModal() {
-  document.getElementById("modalOverlay").style.display = "flex";
+  document.getElementById('modalOverlay').style.display = 'flex';
 }
 
 function closeModal() {
-  document.getElementById("modalOverlay").style.display = "none";
+  document.getElementById('modalOverlay').style.display = 'none';
 }
+
+async function initFeed() {
+  try {
+    const who = await FeedbackService.whoami();
+    currentUser = who.ok ? who.user : null;
+  } catch (err) {
+    currentUser = null;
+  }
+
+  if (window.NotificationService) {
+    if (currentUser) {
+      NotificationService.info(`Welcome back, ${currentUser.displayName || currentUser.username || 'User'}.`);
+    } else {
+      NotificationService.info('Viewing feed as guest. Log in to interact more.');
+    }
+  }
+
+  await Promise.all([loadFeed(), refreshPoints()]);
+  if (window.NotificationService) NotificationService.render();
+}
+
+document.addEventListener('DOMContentLoaded', initFeed);
+window.changeSort = changeSort;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.submitFeedback = submitFeedback;

@@ -7,139 +7,120 @@ function renderEmptyState(container) {
   `;
 }
 
-
-// Helper to anonymize author for display
-function getAuthorLabel(post) {
-  if (!post.author || post.author === 'anonymous') return 'Anonymous';
-  // Show only last 3 chars of publicId for extra privacy
-  if (post.author.startsWith('user-')) return 'User ' + post.author.slice(-3);
-  return 'User';
+function displayAuthor(post) {
+  return post.authorDisplayName || 'Anonymous';
 }
 
-function renderFeed(container, posts, onUpvote, user) {
-  container.innerHTML = "";
+function renderComments(container, comments) {
+  if (!comments.length) {
+    container.innerHTML = '<div class="comment-empty">No comments yet.</div>';
+    return;
+  }
+
+  container.innerHTML = comments.map((c) => `
+    <div class="comment-item">
+      <div class="comment-meta"><strong>${c.author || 'User'}</strong> ${new Date(c.timestamp).toLocaleString()}</div>
+      <div class="comment-text">${c.text}</div>
+    </div>
+  `).join('');
+}
+
+function renderFeed(container, posts, handlers, currentUser) {
+  container.innerHTML = '';
 
   if (!posts.length) {
     renderEmptyState(container);
     return;
   }
 
-  posts.forEach(post => {
-    container.appendChild(createPostElement(post, onUpvote, user));
-  });
-}
+  posts.forEach((post) => {
+    const item = document.createElement('div');
+    item.className = 'feed-item';
+    item.dataset.id = post.id;
 
-function createPostElement(post, onUpvote, user) {
-  const item = document.createElement("div");
-  item.className = "feed-item";
+    item.innerHTML = `
+      <div class="post-owner">${displayAuthor(post)}</div>
+      <div class="feed-subject">${post.issue}</div>
+      <div class="feed-text">
+        <strong>Impact:</strong><br>${post.impact}<br><br>
+        <strong>Suggestion:</strong><br>${post.suggestion || ''}
+      </div>
+      <div class="post-meta">
+        ${post.theme || 'Other'} • ${new Date(post.createdAt).toLocaleDateString()} • Posted by ${displayAuthor(post)}
+      </div>
 
-  const hasUpvoted = localStorage.getItem(`upvoted_${post.id}`);
-  const isAdmin = user && user.isAdmin;
+      <div class="post-actions-row">
+        <button class="upvote-btn ${post.viewerHasUpvoted ? 'active' : ''}" type="button">👍 ${post.upvotes || 0}</button>
+        <button class="upvote-btn ${post.viewerHasLiked ? 'active' : ''}" type="button">❤️ ${post.likes || 0}</button>
+        <button class="secondary-btn comment-toggle" type="button">${post.commentsCount || 0} Comments</button>
+        <button class="secondary-btn updates-toggle" type="button">View Updates</button>
+      </div>
 
-  item.innerHTML = `
-    <div class="feed-subject">${post.issue}</div>
+      <div class="comments-wrap" style="display:none;">
+        <div class="comments-list"></div>
+        <form class="comment-form">
+          <input class="comment-input" type="text" placeholder="Write a comment" ${currentUser ? '' : 'disabled'} />
+          <button class="primary-btn" type="submit" ${currentUser ? '' : 'disabled'}>Post</button>
+        </form>
+      </div>
 
-    <div class="feed-text">
-      <strong>Impact:</strong><br>${post.impact}<br><br>
-      <strong>Suggestion:</strong><br>${post.suggestion}
-    </div>
+      <div class="updates-list" style="display:none;"></div>
+    `;
 
-    <div class="post-meta">
-      ${post.theme} • ${new Date(post.createdAt).toLocaleDateString()} • <span class="author-label">${getAuthorLabel(post)}</span>
-    </div>
+    const [upvoteBtn, likeBtn] = item.querySelectorAll('.upvote-btn');
+    const commentToggle = item.querySelector('.comment-toggle');
+    const commentsWrap = item.querySelector('.comments-wrap');
+    const commentsList = item.querySelector('.comments-list');
+    const commentForm = item.querySelector('.comment-form');
+    const commentInput = item.querySelector('.comment-input');
+    const updatesToggle = item.querySelector('.updates-toggle');
+    const updatesList = item.querySelector('.updates-list');
 
-    <button class="upvote-btn ${hasUpvoted ? "active" : ""}">
-      👍 ${post.upvotes}
-    </button>
+    upvoteBtn.addEventListener('click', () => handlers.onUpvote(post.id));
+    likeBtn.addEventListener('click', () => handlers.onLike(post.id));
 
-    <button class="toggle-updates-btn" style="margin-left:1rem;">View Updates</button>
-    <div class="updates-list" style="display:none;"></div>
-    ${isAdmin ? `
-    <button class="add-update-btn secondary-btn" style="margin-left:1rem;">Add Update</button>
-    <div class="add-update-form" style="display:none; margin-top:1rem;">
-      <textarea class="update-textarea" placeholder="Enter update content" rows="3"></textarea><br>
-      <button class="submit-update-btn primary-btn" style="margin-top:0.5rem;">Submit</button>
-      <button class="cancel-update-btn secondary-btn" style="margin-left:0.5rem;">Cancel</button>
-    </div>
-    ` : ''}
-  `;
+    commentToggle.addEventListener('click', async () => {
+      const opening = commentsWrap.style.display === 'none';
+      commentsWrap.style.display = opening ? 'block' : 'none';
+      commentToggle.textContent = opening ? 'Hide Comments' : `${post.commentsCount || 0} Comments`;
+      if (!opening) return;
+      const comments = await handlers.onLoadComments(post.id);
+      renderComments(commentsList, comments);
+    });
 
-  item.querySelector(".upvote-btn").onclick = () => onUpvote(post.id);
+    commentForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const text = commentInput.value.trim();
+      if (!text) return;
+      await handlers.onComment(post.id, text);
+      commentInput.value = '';
+      const comments = await handlers.onLoadComments(post.id);
+      renderComments(commentsList, comments);
+    });
 
-  // Toggle updates
-  const toggleBtn = item.querySelector('.toggle-updates-btn');
-  const updatesList = item.querySelector('.updates-list');
-  let updatesLoaded = false;
-  toggleBtn.onclick = async () => {
-    if (updatesList.style.display === 'none') {
-      if (!updatesLoaded) {
-        updatesList.innerHTML = '<div class="loading">Loading updates...</div>';
-        const updates = await FeedbackService.getUpdates(post.id);
-        updatesList.innerHTML = '';
-        if (updates.length === 0) {
-          updatesList.innerHTML = '<div class="no-updates">No updates yet.</div>';
-        } else {
-          updates.forEach(u => {
-            const uDiv = document.createElement('div');
-            uDiv.className = 'feedback-update';
-            uDiv.innerHTML = `<div class="update-meta"><strong>${u.authorRole}</strong> <span>${new Date(u.timestamp).toLocaleString()}</span></div><div class="update-text">${u.content}</div>`;
-            updatesList.appendChild(uDiv);
-          });
-        }
-        updatesLoaded = true;
-      }
-      updatesList.style.display = '';
-      toggleBtn.textContent = 'Hide Updates';
-    } else {
-      updatesList.style.display = 'none';
-      toggleBtn.textContent = 'View Updates';
-    }
-  };
-
-  if (isAdmin) {
-    const addBtn = item.querySelector('.add-update-btn');
-    const form = item.querySelector('.add-update-form');
-    const textarea = item.querySelector('.update-textarea');
-    const submitBtn = item.querySelector('.submit-update-btn');
-    const cancelBtn = item.querySelector('.cancel-update-btn');
-
-    addBtn.onclick = () => {
-      form.style.display = form.style.display === 'none' ? '' : 'none';
-    };
-
-    submitBtn.onclick = async () => {
-      const content = textarea.value.trim();
-      if (!content) return;
+    updatesToggle.addEventListener('click', async () => {
+      const opening = updatesList.style.display === 'none';
+      updatesList.style.display = opening ? 'block' : 'none';
+      updatesToggle.textContent = opening ? 'Hide Updates' : 'View Updates';
+      if (!opening) return;
+      updatesList.innerHTML = '<div class="comment-empty">Loading updates...</div>';
       try {
-        await FeedbackService.addUpdate(post.id, content);
-        textarea.value = '';
-        form.style.display = 'none';
-        // Reload updates if visible
-        if (updatesList.style.display !== 'none') {
-          updatesList.innerHTML = '<div class="loading">Loading updates...</div>';
-          const updates = await FeedbackService.getUpdates(post.id);
-          updatesList.innerHTML = '';
-          if (updates.length === 0) {
-            updatesList.innerHTML = '<div class="no-updates">No updates yet.</div>';
-          } else {
-            updates.forEach(u => {
-              const uDiv = document.createElement('div');
-              uDiv.className = 'feedback-update';
-              uDiv.innerHTML = `<div class="update-meta"><strong>${u.authorRole}</strong> <span>${new Date(u.timestamp).toLocaleString()}</span></div><div class="update-text">${u.content}</div>`;
-              updatesList.appendChild(uDiv);
-            });
-          }
+        const updates = await handlers.onLoadUpdates(post.id);
+        if (!updates.length) {
+          updatesList.innerHTML = '<div class="comment-empty">No updates yet.</div>';
+          return;
         }
-      } catch (e) {
-        alert('Failed to add update');
+        updatesList.innerHTML = updates.map((u) => `
+          <div class="feedback-update">
+            <div class="update-meta"><strong>${u.authorRole || 'admin'}</strong> ${new Date(u.timestamp).toLocaleString()}</div>
+            <div class="update-text">${u.content}</div>
+          </div>
+        `).join('');
+      } catch (err) {
+        updatesList.innerHTML = '<div class="comment-empty">Failed to load updates.</div>';
       }
-    };
+    });
 
-    cancelBtn.onclick = () => {
-      textarea.value = '';
-      form.style.display = 'none';
-    };
-  }
-
-  return item;
+    container.appendChild(item);
+  });
 }

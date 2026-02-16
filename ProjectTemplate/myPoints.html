@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Points | Scrum Squad</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+        <a href="myPoints.html">My Points</a>
+        <a href="shop.html">Shop</a>
+        <a href="dataPage.html">Data</a>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <section class="card points-card">
+        <h1>My Points</h1>
+        <p class="points-total">Available: <strong id="pointsTotal">0</strong></p>
+        <div class="points-grid">
+          <div class="points-box">
+            <h3>From Comments</h3>
+            <p id="commentsPoints">0</p>
+          </div>
+          <div class="points-box">
+            <h3>From Upvotes</h3>
+            <p id="upvotesPoints">0</p>
+          </div>
+          <div class="points-box">
+            <h3>From Likes</h3>
+            <p id="likesPoints">0</p>
+          </div>
+        </div>
+        <p id="pointsRulesText">Rules: +3 comment, +2 upvote, +1 like (on your posts).</p>
+        <div id="pointsError" class="form-message"></div>
+      </section>
+    </main>
+
+    <div class="footer">© 2026 Scrum Squad Project Team. All rights reserved.</div>
+
+    <script src="JavaScript/feedbackService.js"></script>
+    <script src="JavaScript/notificationService.js"></script>
+    <script src="JavaScript/myPointsPage.js"></script>
+  </body>
+</html>

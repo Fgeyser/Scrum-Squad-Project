@@ -1,88 +1,148 @@
-// Data access layer (local + API)
-const LOCAL_STORAGE_KEY = "scrum_squad_feedback";
-// Match the mock backend port used by the demo server
-const API_BASE = (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : 'http://localhost:8001';
+const API_BASE = window.API_BASE || 'http://localhost:8001';
 
-// Local helpers
-
-function loadLocalFeedback() {
-  return JSON.parse(localStorage.getItem(LOCAL_STORAGE_KEY)) || [];
-}
-
-function saveLocalFeedback(list) {
-  localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(list));
-}
-
-// Local upvote toggle
-
-function toggleLocalUpvote(id) {
-  const list = loadLocalFeedback();
-  const post = list.find(p => p.id === id);
-  if (!post) return;
-
-  const voteKey = `upvoted_${id}`;
-
-  if (localStorage.getItem(voteKey)) {
-    post.upvotes = Math.max(0, post.upvotes - 1);
-    localStorage.removeItem(voteKey);
-  } else {
-    post.upvotes++;
-    localStorage.setItem(voteKey, "true");
+async function parseJsonResponse(resp) {
+  const data = await resp.json().catch(() => ({}));
+  if (!resp.ok) {
+    const msg = data && data.message ? data.message : 'Request failed';
+    throw new Error(msg);
   }
-
-  saveLocalFeedback(list);
+  return data;
 }
-
-// Feedback Service
 
 const FeedbackService = {
+  async whoami() {
+    const resp = await fetch(API_BASE + '/api/whoami', { credentials: 'include' });
+    return parseJsonResponse(resp);
+  },
 
-  // Get all feedback (API first, local fallback)
   async getAll() {
-    try {
-      const res = await fetch(API_BASE + "/api/feedback", { credentials: 'include' });
-      if (!res.ok) throw new Error("API unavailable");
-      return await res.json();
-    } catch (err) {
-      console.warn('Falling back to local feedback due to:', err && err.message);
-      return loadLocalFeedback();
-    }
+    const resp = await fetch(API_BASE + '/api/feedback', { credentials: 'include' });
+    return parseJsonResponse(resp);
   },
 
-  // Create new feedback
   async create(feedback) {
-    try {
-      await fetch(API_BASE + "/api/feedback", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        credentials: 'include',
-        body: JSON.stringify(feedback)
-      });
-    } catch (err) {
-      console.warn('POST /api/feedback failed, falling back to local. Error:', err && err.message);
-      const list = loadLocalFeedback();
-
-      list.unshift({
-        id: Date.now(),
-        issue: feedback.issue,
-        impact: feedback.impact,
-        suggestion: feedback.suggestion,
-        theme: feedback.theme || "Other",
-        createdAt: new Date().toISOString(),
-        upvotes: 0
-      });
-
-      saveLocalFeedback(list);
-    }
+    const resp = await fetch(API_BASE + '/api/feedback', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify(feedback)
+    });
+    return parseJsonResponse(resp);
   },
 
-  // Toggle upvote / un-upvote
   async toggleUpvote(id) {
-    try {
-      await fetch(API_BASE + `/api/feedback/${id}/upvote`, { method: "POST", credentials: 'include' });
-    } catch (err) {
-      console.warn('Upvote API failed, using local toggle. Error:', err && err.message);
-      toggleLocalUpvote(id);
-    }
+    const resp = await fetch(API_BASE + `/api/feedback/${id}/upvote`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async toggleLike(id) {
+    const resp = await fetch(API_BASE + `/api/feedback/${id}/like`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async getComments(postId) {
+    const resp = await fetch(API_BASE + `/api/feedback/${postId}/comments`, {
+      credentials: 'include'
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async addComment(postId, text) {
+    const resp = await fetch(API_BASE + `/api/feedback/${postId}/comments`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ text })
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async getMyPoints() {
+    const resp = await fetch(API_BASE + '/api/my-points', { credentials: 'include' });
+    return parseJsonResponse(resp);
+  },
+
+  async getUpdates(postId) {
+    const resp = await fetch(API_BASE + `/api/feedback/${postId}/updates`, {
+      credentials: 'include'
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async addUpdate(postId, text) {
+    const resp = await fetch(API_BASE + `/api/feedback/${postId}/update`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ text })
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async getNotifications() {
+    const resp = await fetch(API_BASE + '/api/notifications', { credentials: 'include' });
+    return parseJsonResponse(resp);
+  },
+
+  async markNotificationRead(id) {
+    const resp = await fetch(API_BASE + `/api/notifications/${id}/read`, {
+      method: 'POST',
+      credentials: 'include'
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async deleteNotification(id) {
+    const resp = await fetch(API_BASE + `/api/notifications/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async clearAllNotifications() {
+    const resp = await fetch(API_BASE + '/api/notifications', {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async markAllNotificationsRead() {
+    const resp = await fetch(API_BASE + '/api/notifications/mark-all-read', {
+      method: 'POST',
+      credentials: 'include'
+    });
+    return parseJsonResponse(resp);
+  },
+
+  async getShopItems() {
+    const resp = await fetch(API_BASE + '/api/shop/items', { credentials: 'include' });
+    return parseJsonResponse(resp);
+  },
+
+  async getShopMe() {
+    const resp = await fetch(API_BASE + '/api/shop/me', { credentials: 'include' });
+    return parseJsonResponse(resp);
+  },
+
+  async redeem(itemId) {
+    const idempotencyKey = `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+    const resp = await fetch(API_BASE + '/api/shop/redeem', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-idempotency-key': idempotencyKey
+      },
+      credentials: 'include',
+      body: JSON.stringify({ itemId })
+    });
+    return parseJsonResponse(resp);
   }
 };

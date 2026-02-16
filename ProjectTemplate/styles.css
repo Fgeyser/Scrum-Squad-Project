@@ -49,6 +49,11 @@ body {
   transition: color var(--transition-speed);
 }
 
+.navbar-links {
+  display: flex;
+  align-items: center;
+}
+
 .navbar-links a:hover {
   color: var(--primary-color);
 }
@@ -309,6 +314,34 @@ textarea:focus {
   margin-top: 0.5rem;
 }
 
+.post-owner {
+  font-size: 0.95rem;
+  color: var(--primary-color);
+  font-weight: 700;
+  margin-bottom: 0.35rem;
+}
+
+.feed-toolbar {
+  padding: 1rem 2rem;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.points-summary {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  color: var(--muted-text);
+  flex-wrap: wrap;
+}
+
+.points-summary strong {
+  color: var(--text-color);
+}
+
 .upvote-btn {
   margin-top: 0.75rem;
   background-color: #f1f5f9;
@@ -321,6 +354,211 @@ textarea:focus {
 .upvote-btn.active {
   background-color: var(--primary-color);
   color: #fff;
+}
+
+.post-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  flex-wrap: wrap;
+  margin-top: 0.75rem;
+}
+
+.comment-toggle,
+.updates-toggle {
+  margin: 0;
+}
+
+.comments-wrap {
+  margin-top: 0.85rem;
+  border-top: 1px solid #eef2f7;
+  padding-top: 0.85rem;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.comment-item {
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 0.55rem 0.7rem;
+}
+
+.comment-meta {
+  font-size: 0.8rem;
+  color: var(--muted-text);
+  margin-bottom: 0.2rem;
+}
+
+.comment-text {
+  color: var(--text-color);
+  line-height: 1.4;
+}
+
+.comment-empty {
+  font-size: 0.85rem;
+  color: var(--muted-text);
+  padding: 0.3rem 0;
+}
+
+.comment-form {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.comment-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.auth-form {
+  margin-top: 1rem;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.form-message {
+  min-height: 1.2rem;
+  color: #b91c1c;
+  font-size: 0.9rem;
+  margin: 0.4rem 0;
+}
+
+.section-title {
+  margin: 0.5rem 0 0.75rem;
+}
+
+.points-card {
+  max-width: 760px;
+  text-align: left;
+}
+
+.points-total {
+  margin: 0.8rem 0 1rem;
+}
+
+.points-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 0.8rem;
+}
+
+.points-box {
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0.9rem;
+  background: #f8fafc;
+}
+
+.points-box h3 {
+  font-size: 0.95rem;
+  margin-bottom: 0.35rem;
+}
+
+.points-box p {
+  font-size: 1.25rem;
+  color: var(--text-color);
+  font-weight: 700;
+}
+
+.shop-main {
+  align-items: stretch;
+  flex-direction: column;
+  gap: 1rem;
+  width: min(1100px, 100%);
+  margin: 0 auto;
+}
+
+.shop-header {
+  max-width: 100%;
+  text-align: left;
+  padding: 1.2rem 1.5rem;
+}
+
+.shop-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1rem;
+  width: 100%;
+}
+
+.shop-history {
+  max-width: 100%;
+  text-align: left;
+  padding: 1.2rem 1.5rem;
+}
+
+.shop-history h2 {
+  margin-bottom: 0.6rem;
+}
+
+.shop-history-hint {
+  color: var(--muted-text);
+  margin-bottom: 0.6rem;
+}
+
+.shop-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.history-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  background: #f8fafc;
+  padding: 0.7rem 0.9rem;
+}
+
+.history-meta {
+  color: var(--muted-text);
+  font-size: 0.82rem;
+  margin-top: 0.2rem;
+}
+
+.history-cost {
+  color: var(--text-color);
+  font-weight: 700;
+}
+
+.shop-item {
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.06);
+}
+
+.shop-item-image {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  display: block;
+  background: #e5e7eb;
+}
+
+.shop-item-body {
+  padding: 0.9rem;
+}
+
+.shop-item-body h3 {
+  font-size: 1rem;
+  margin-bottom: 0.4rem;
+}
+
+.shop-item-body p {
+  margin-bottom: 0.6rem;
 }
 
 /* UPDATES */
@@ -571,6 +809,7 @@ textarea:focus {
 }
 
 .toast {
+  position: relative;
   width: 320px;
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -585,6 +824,24 @@ textarea:focus {
 .toast.hide {
   opacity: 0;
   transform: translateY(-6px);
+}
+
+.toast-close-btn {
+  position: absolute;
+  top: 0.35rem;
+  right: 0.35rem;
+  background: transparent;
+  border: none;
+  margin: 0;
+  padding: 0.15rem 0.35rem;
+  color: #6b7280;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.toast-close-btn:hover {
+  color: #111827;
+  transform: none;
 }
 
 .toast-title {

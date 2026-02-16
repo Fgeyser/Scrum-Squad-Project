@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop | Scrum Squad</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+        <a href="myPoints.html">My Points</a>
+        <a href="shop.html">Shop</a>
+        <a href="dataPage.html">Data</a>
+      </div>
+    </div>
+
+    <main class="main-content shop-main">
+      <section class="shop-header card">
+        <h1>Rewards Shop</h1>
+        <p>Your available points: <strong id="shopPoints">0</strong></p>
+        <div id="shopStatus" class="form-message"></div>
+      </section>
+
+      <section class="shop-grid" id="shopGrid"></section>
+
+      <section class="shop-history card">
+        <h2>Your Products</h2>
+        <div id="shopHistoryHint" class="shop-history-hint">Log in to view redemption history.</div>
+        <div id="shopHistoryList" class="shop-history-list"></div>
+      </section>
+    </main>
+
+    <div class="footer">© 2026 Scrum Squad Project Team. All rights reserved.</div>
+
+    <script src="JavaScript/feedbackService.js"></script>
+    <script src="JavaScript/notificationService.js"></script>
+    <script src="JavaScript/shopPage.js"></script>
+  </body>
+</html>
