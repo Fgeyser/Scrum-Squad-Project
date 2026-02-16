@@ -4,20 +4,23 @@
     "password": "password123",
     "displayName": "Employee One",
     "publicId": "user-kfiagi",
-    "role": "employee"
+    "role": "employee",
+    "points": 6
   },
   {
     "username": "alice",
     "password": "alicepass",
     "displayName": "Alice Example",
     "publicId": "user-d9nmq4",
-    "role": "employee"
+    "role": "employee",
+    "points": 0
   },
   {
     "username": "admin",
     "password": "adminpass",
     "displayName": "Admin User",
     "publicId": "user-admin",
-    "role": "admin"
+    "role": "admin",
+    "points": 0
   }
 ]
