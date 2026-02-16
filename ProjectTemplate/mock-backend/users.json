@@ -45,5 +45,25 @@
     "points": 0,
     "earnedPoints": 0,
     "spentPoints": 0
+  },
+  {
+    "username": "signup_test_user_2",
+    "password": "pass123",
+    "displayName": "Signup Test",
+    "publicId": "user-tlrq0p",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "signup_test_user_3",
+    "password": "pass123",
+    "displayName": "Signup Test",
+    "publicId": "user-0frury",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
   }
 ]

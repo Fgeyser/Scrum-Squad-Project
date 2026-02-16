@@ -1,35 +1,5 @@
 [
   {
-    "id": 1771282565198,
-    "userPublicId": "user-q8ryc8",
-    "postId": 1771282513332,
-    "type": "comment",
-    "title": "New interaction",
-    "message": "g commented on your post \"a\".",
-    "ts": "2026-02-16T22:56:05.155Z",
-    "read": false
-  },
-  {
-    "id": 1771282560782,
-    "userPublicId": "user-q8ryc8",
-    "postId": 1771282513332,
-    "type": "like",
-    "title": "New interaction",
-    "message": "g liked your post \"a\".",
-    "ts": "2026-02-16T22:56:00.360Z",
-    "read": false
-  },
-  {
-    "id": 1771282560742,
-    "userPublicId": "user-q8ryc8",
-    "postId": 1771282513332,
-    "type": "upvote",
-    "title": "New interaction",
-    "message": "g upvoted your post \"a\".",
-    "ts": "2026-02-16T22:55:59.881Z",
-    "read": false
-  },
-  {
     "id": 1771214600060,
     "userPublicId": "user-tbahsf",
     "postId": 1771214599901,
