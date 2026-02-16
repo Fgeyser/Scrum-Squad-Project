@@ -32,9 +32,14 @@ async function initFeed() {
       );
     }
   }
+  updatePointsUI();
 
   // Show empty state immediately
-  renderFeed(feed, [], handleUpvote, currentUser);
+  renderFeed(feed, [], {
+    onUpvote: handleUpvote,
+    onLike: handleLike,
+    onComment: handleComment
+  }, currentUser);
 
   try {
     feedbackList = await FeedbackService.getAll();
@@ -55,7 +60,17 @@ async function initFeed() {
 
 function render() {
   const feed = document.getElementById("feedList");
-  renderFeed(feed, getSortedFeedback(), handleUpvote, currentUser);
+  renderFeed(feed, getSortedFeedback(), {
+    onUpvote: handleUpvote,
+    onLike: handleLike,
+    onComment: handleComment
+  }, currentUser);
+}
+
+function updatePointsUI() {
+  const el = document.getElementById("pointsValue");
+  if (!el) return;
+  el.textContent = currentUser ? String(currentUser.points || 0) : "0";
 }
 
 function getSortedFeedback() {
@@ -90,7 +105,11 @@ function changeSort() {
 
 async function handleUpvote(id) {
   try {
-    await FeedbackService.toggleUpvote(id);
+    const result = await FeedbackService.toggleUpvote(id);
+    if (currentUser && typeof result.points === "number") {
+      currentUser.points = result.points;
+      updatePointsUI();
+    }
 
     if (window.NotificationService) {
       NotificationService.success("Upvote saved!");
@@ -102,6 +121,49 @@ async function handleUpvote(id) {
     if (window.NotificationService) {
       NotificationService.error("Could not save upvote. Please try again.");
     }
+  }
+}
+
+async function handleLike(id) {
+  try {
+    const result = await FeedbackService.toggleLike(id);
+    if (currentUser && typeof result.points === "number") {
+      currentUser.points = result.points;
+      updatePointsUI();
+    }
+
+    if (window.NotificationService) {
+      NotificationService.success("Like saved!");
+    }
+
+    feedbackList = await FeedbackService.getAll();
+    render();
+  } catch (err) {
+    if (window.NotificationService) {
+      NotificationService.error(err.message || "Could not save like. Please try again.");
+    }
+  }
+}
+
+async function handleComment(id, text) {
+  try {
+    const result = await FeedbackService.addComment(id, text);
+    if (currentUser && typeof result.points === "number") {
+      currentUser.points = result.points;
+      updatePointsUI();
+    }
+
+    if (window.NotificationService) {
+      NotificationService.success("Comment posted!");
+    }
+
+    feedbackList = await FeedbackService.getAll();
+    render();
+  } catch (err) {
+    if (window.NotificationService) {
+      NotificationService.error(err.message || "Could not post comment.");
+    }
+    throw err;
   }
 }
 
@@ -162,9 +224,20 @@ async function submitFeedback() {
 
 // Modal helpers (UI only)
 function openModal() {
+  if (!currentUser) {
+    if (window.NotificationService) {
+      NotificationService.error("Please log in to post feedback.");
+    }
+    return;
+  }
   document.getElementById("modalOverlay").style.display = "flex";
 }
 
 function closeModal() {
   document.getElementById("modalOverlay").style.display = "none";
 }
+
+window.changeSort = changeSort;
+window.openModal = openModal;
+window.closeModal = closeModal;
+window.submitFeedback = submitFeedback;

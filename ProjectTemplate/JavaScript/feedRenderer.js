@@ -16,7 +16,7 @@ function getAuthorLabel(post) {
   return 'User';
 }
 
-function renderFeed(container, posts, onUpvote, user) {
+function renderFeed(container, posts, handlers, user) {
   container.innerHTML = "";
 
   if (!posts.length) {
@@ -25,18 +25,20 @@ function renderFeed(container, posts, onUpvote, user) {
   }
 
   posts.forEach(post => {
-    container.appendChild(createPostElement(post, onUpvote, user));
+    container.appendChild(createPostElement(post, handlers, user));
   });
 }
 
-function createPostElement(post, onUpvote, user) {
+function createPostElement(post, handlers, user) {
   const item = document.createElement("div");
   item.className = "feed-item";
 
-  const hasUpvoted = localStorage.getItem(`upvoted_${post.id}`);
+  const hasUpvoted = post.viewerHasUpvoted || localStorage.getItem(`upvoted_${post.id}`);
+  const hasLiked = post.viewerHasLiked || false;
   const isAdmin = user && user.isAdmin;
 
   item.innerHTML = `
+    <div style="font-weight:700; margin-bottom:0.25rem;">${post.authorDisplayName || getAuthorLabel(post)}</div>
     <div class="feed-subject">${post.issue}</div>
 
     <div class="feed-text">
@@ -45,15 +47,27 @@ function createPostElement(post, onUpvote, user) {
     </div>
 
     <div class="post-meta">
-      ${post.theme} • ${new Date(post.createdAt).toLocaleDateString()} • <span class="author-label">${getAuthorLabel(post)}</span>
+      ${post.theme} • ${new Date(post.createdAt).toLocaleDateString()}
     </div>
+    ${post.commentsCount > 0 ? `<div class="post-meta" style="margin-top:0.3rem;">Latest comment by <strong>${post.latestCommentAuthor || "User"}</strong>: ${post.latestCommentText || ""}</div>` : ""}
 
-    <button class="upvote-btn ${hasUpvoted ? "active" : ""}">
+    <button class="upvote-btn action-upvote ${hasUpvoted ? "active" : ""}">
       👍 ${post.upvotes}
+    </button>
+    <button class="upvote-btn action-like ${hasLiked ? "active" : ""}" style="margin-left:0.5rem;">
+      ❤️ ${post.likes || 0}
+    </button>
+    <button class="secondary-btn comment-toggle-btn" style="margin-left:0.5rem;">
+      💬 ${post.commentsCount || 0}
     </button>
 
     <button class="toggle-updates-btn" style="margin-left:1rem;">View Updates</button>
     <div class="updates-list" style="display:none;"></div>
+    <div class="comments-list" style="display:none; margin-top:0.75rem;"></div>
+    <div class="comment-form" style="display:none; margin-top:0.5rem;">
+      <textarea class="comment-textarea" placeholder="Add a comment..." rows="2" style="width:100%;"></textarea>
+      <button class="primary-btn submit-comment-btn" style="margin-top:0.4rem;">Post Comment</button>
+    </div>
     ${isAdmin ? `
     <button class="add-update-btn secondary-btn" style="margin-left:1rem;">Add Update</button>
     <div class="add-update-form" style="display:none; margin-top:1rem;">
@@ -64,7 +78,60 @@ function createPostElement(post, onUpvote, user) {
     ` : ''}
   `;
 
-  item.querySelector(".upvote-btn").onclick = () => onUpvote(post.id);
+  const upvoteBtn = item.querySelector(".action-upvote");
+  const likeBtn = item.querySelector(".action-like");
+  upvoteBtn.onclick = () => handlers.onUpvote(post.id);
+  likeBtn.onclick = () => handlers.onLike(post.id);
+
+  const commentsToggleBtn = item.querySelector(".comment-toggle-btn");
+  const commentsList = item.querySelector(".comments-list");
+  const commentForm = item.querySelector(".comment-form");
+  const commentTextarea = item.querySelector(".comment-textarea");
+  const submitCommentBtn = item.querySelector(".submit-comment-btn");
+  let commentsLoaded = false;
+
+  commentsToggleBtn.onclick = async () => {
+    if (commentsList.style.display === "none") {
+      commentsList.style.display = "";
+      commentForm.style.display = user ? "" : "none";
+      commentsToggleBtn.textContent = `Hide Comments (${post.commentsCount || 0})`;
+      if (!commentsLoaded) {
+        commentsList.innerHTML = "<div class='loading'>Loading comments...</div>";
+        try {
+          const comments = await FeedbackService.getComments(post.id);
+          commentsList.innerHTML = "";
+          if (!comments.length) {
+            commentsList.innerHTML = "<div class='no-updates'>No comments yet.</div>";
+          } else {
+            comments.forEach(c => {
+              const cDiv = document.createElement("div");
+              cDiv.className = "feedback-update";
+              cDiv.innerHTML = `<div class="update-meta"><strong>${c.author || "User"}</strong> <span>${new Date(c.timestamp).toLocaleString()}</span></div><div class="update-text">${c.text}</div>`;
+              commentsList.appendChild(cDiv);
+            });
+          }
+          commentsLoaded = true;
+        } catch {
+          commentsList.innerHTML = "<div class='no-updates'>Could not load comments.</div>";
+        }
+      }
+    } else {
+      commentsList.style.display = "none";
+      commentForm.style.display = "none";
+      commentsToggleBtn.textContent = `💬 ${post.commentsCount || 0}`;
+    }
+  };
+
+  submitCommentBtn.onclick = async () => {
+    const text = commentTextarea.value.trim();
+    if (!text) return;
+    submitCommentBtn.disabled = true;
+    try {
+      await handlers.onComment(post.id, text);
+    } finally {
+      submitCommentBtn.disabled = false;
+    }
+  };
 
   // Toggle updates
   const toggleBtn = item.querySelector('.toggle-updates-btn');

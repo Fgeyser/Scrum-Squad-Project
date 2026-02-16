@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>My Points | Scrum Squad</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+        <a href="myPoints.html">My Points</a>
+        <a href="shop.html">Shop</a>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <div class="card" style="max-width: 720px; margin: 0 auto;">
+        <h1 style="margin-bottom: 0.4rem;">My Points</h1>
+        <p id="pointsSubtitle" style="margin-bottom: 1rem; color: #6b7280;">Loading your points...</p>
+
+        <div style="font-size: 2rem; font-weight: 800; color: #0b1a78; margin-bottom: 1rem;">
+          <span id="totalPoints">0</span> pts
+        </div>
+
+        <div style="display: grid; grid-template-columns: repeat(3, minmax(120px, 1fr)); gap: 0.8rem;">
+          <div style="padding: 0.8rem; border: 1px solid #e5e7eb; border-radius: 10px;">
+            <div style="font-size: 0.9rem; color: #6b7280;">Likes received</div>
+            <div id="likesCount" style="font-size: 1.4rem; font-weight: 700;">0</div>
+          </div>
+          <div style="padding: 0.8rem; border: 1px solid #e5e7eb; border-radius: 10px;">
+            <div style="font-size: 0.9rem; color: #6b7280;">Upvotes received</div>
+            <div id="upvotesCount" style="font-size: 1.4rem; font-weight: 700;">0</div>
+          </div>
+          <div style="padding: 0.8rem; border: 1px solid #e5e7eb; border-radius: 10px;">
+            <div style="font-size: 0.9rem; color: #6b7280;">Comments received</div>
+            <div id="commentsCount" style="font-size: 1.4rem; font-weight: 700;">0</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem; color: #6b7280;">
+          Scoring: +<span id="ruleLike">1</span> like, +<span id="ruleUpvote">2</span> upvote, +<span id="ruleComment">3</span> comment
+        </div>
+      </div>
+    </main>
+
+    <div class="footer">© 2026 Scrum Squad Project Team. All rights reserved.</div>
+
+    <script src="JavaScript/notificationService.js"></script>
+    <script>
+      async function loadMyPoints() {
+        const subtitle = document.getElementById("pointsSubtitle");
+        try {
+          const whoRes = await fetch("/api/whoami", { credentials: "include" });
+          const who = await whoRes.json();
+          if (!who.ok || !who.user) {
+            subtitle.textContent = "Please log in to view your points.";
+            return;
+          }
+
+          subtitle.textContent = `Points earned from interactions on ${who.user.displayName || "your"} posts.`;
+
+          const res = await fetch("/api/my-points", { credentials: "include" });
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            subtitle.textContent = data.message || "Unable to load points.";
+            return;
+          }
+
+          document.getElementById("totalPoints").textContent = data.points || 0;
+          document.getElementById("likesCount").textContent = data.breakdown.likesReceived || 0;
+          document.getElementById("upvotesCount").textContent = data.breakdown.upvotesReceived || 0;
+          document.getElementById("commentsCount").textContent = data.breakdown.commentsReceived || 0;
+          document.getElementById("ruleLike").textContent = data.rules.like;
+          document.getElementById("ruleUpvote").textContent = data.rules.upvote;
+          document.getElementById("ruleComment").textContent = data.rules.comment;
+        } catch (err) {
+          subtitle.textContent = "Unable to load points right now.";
+        }
+      }
+
+      loadMyPoints();
+    </script>
+  </body>
+</html>

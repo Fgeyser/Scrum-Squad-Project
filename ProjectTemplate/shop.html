@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop | Scrum Squad</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      .shop-wrap {
+        width: 100%;
+        max-width: 1100px;
+      }
+      .shop-summary {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+        margin-bottom: 1rem;
+      }
+      .shop-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+      .shop-card {
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+      }
+      .shop-card img {
+        width: 100%;
+        height: 140px;
+        object-fit: cover;
+        background: #f1f5f9;
+      }
+      .shop-card-body {
+        padding: 0.85rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+      .shop-cost {
+        color: #0b1a78;
+        font-weight: 700;
+      }
+      .shop-history {
+        margin-top: 1rem;
+        background: #fff;
+        border: 1px solid #e5e7eb;
+        border-radius: 10px;
+        padding: 1rem 1.25rem;
+      }
+      .shop-history ul {
+        margin-top: 0.7rem;
+        padding-left: 1.2rem;
+        color: #4b5563;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+        <a href="myPoints.html">My Points</a>
+        <a href="shop.html">Shop</a>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <div class="shop-wrap">
+        <div class="shop-summary">
+          <h1 style="font-size: 2rem; margin-bottom: 0.3rem;">Rewards Shop</h1>
+          <p id="shopStatus">Loading your points...</p>
+          <div style="margin-top: 0.5rem; color: #6b7280;">
+            Available: <strong id="shopPoints">0</strong> pts |
+            Earned: <strong id="shopEarned">0</strong> pts |
+            Spent: <strong id="shopSpent">0</strong> pts
+          </div>
+        </div>
+
+        <div class="shop-grid" id="shopGrid"></div>
+
+        <div class="shop-history">
+          <h2 style="font-size: 1.3rem;">Redemption History</h2>
+          <ul id="shopHistory">
+            <li>No redemptions yet.</li>
+          </ul>
+        </div>
+      </div>
+    </main>
+
+    <div class="footer">© 2026 Scrum Squad Project Team. All rights reserved.</div>
+
+    <script src="JavaScript/notificationService.js"></script>
+    <script>
+      let myPoints = 0;
+      let items = [];
+
+      function setSummary(data) {
+        document.getElementById("shopPoints").textContent = data.points || 0;
+        document.getElementById("shopEarned").textContent = data.earnedPoints || 0;
+        document.getElementById("shopSpent").textContent = data.spentPoints || 0;
+        myPoints = data.points || 0;
+      }
+
+      function renderHistory(redemptions) {
+        const list = document.getElementById("shopHistory");
+        if (!redemptions || !redemptions.length) {
+          list.innerHTML = "<li>No redemptions yet.</li>";
+          return;
+        }
+        list.innerHTML = redemptions
+          .slice(0, 8)
+          .map(
+            (r) =>
+              `<li><strong>${r.itemName}</strong> (${r.cost} pts) • ${new Date(r.ts).toLocaleString()}</li>`,
+          )
+          .join("");
+      }
+
+      function renderItems() {
+        const grid = document.getElementById("shopGrid");
+        grid.innerHTML = items
+          .map((item) => {
+            const canRedeem = myPoints >= item.cost;
+            return `
+              <div class="shop-card">
+                <img src="${item.image}" alt="${item.name}" loading="lazy" />
+                <div class="shop-card-body">
+                  <div style="font-weight:700;">${item.name}</div>
+                  <div class="shop-cost">${item.cost} points</div>
+                  <button class="${canRedeem ? "primary-btn" : "secondary-btn"}" ${canRedeem ? "" : "disabled"} onclick="redeemItem('${item.id}')">
+                    ${canRedeem ? "Redeem" : "Not enough points"}
+                  </button>
+                </div>
+              </div>
+            `;
+          })
+          .join("");
+      }
+
+      async function loadShop() {
+        const status = document.getElementById("shopStatus");
+        try {
+          const whoRes = await fetch("/api/whoami", { credentials: "include" });
+          const who = await whoRes.json();
+          if (!who.ok || !who.user) {
+            status.textContent = "Please log in to use the shop.";
+            document.getElementById("shopGrid").innerHTML = "";
+            return;
+          }
+          status.textContent = `Welcome, ${who.user.displayName || "User"}! Redeem rewards using your points.`;
+
+          const [itemsRes, meRes] = await Promise.all([
+            fetch("/api/shop/items", { credentials: "include" }),
+            fetch("/api/shop/me", { credentials: "include" }),
+          ]);
+          const itemsData = await itemsRes.json();
+          const meData = await meRes.json();
+
+          if (!itemsData.ok || !meData.ok) {
+            status.textContent = "Unable to load shop right now.";
+            return;
+          }
+
+          items = itemsData.items || [];
+          setSummary(meData);
+          renderHistory(meData.redemptions || []);
+          renderItems();
+        } catch {
+          status.textContent = "Unable to load shop right now.";
+        }
+      }
+
+      async function redeemItem(itemId) {
+        try {
+          const res = await fetch("/api/shop/redeem", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            credentials: "include",
+            body: JSON.stringify({ itemId }),
+          });
+          const data = await res.json();
+          if (!res.ok || !data.ok) {
+            if (window.NotificationService) {
+              NotificationService.error(data.message || "Could not redeem item.");
+            }
+            return;
+          }
+
+          if (window.NotificationService) {
+            NotificationService.success(`Redeemed ${data.redemption.itemName}!`);
+          }
+
+          await loadShop();
+        } catch {
+          if (window.NotificationService) {
+            NotificationService.error("Could not redeem item.");
+          }
+        }
+      }
+
+      window.redeemItem = redeemItem;
+      loadShop();
+    </script>
+  </body>
+</html>

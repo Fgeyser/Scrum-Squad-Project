@@ -1,7 +1,7 @@
 // Data access layer (local + API)
 const LOCAL_STORAGE_KEY = "scrum_squad_feedback";
-// Match the mock backend port used by the demo server
-const API_BASE = (typeof window !== 'undefined' && window.API_BASE) ? window.API_BASE : 'http://localhost:8001';
+// Use same-origin API so any backend port works.
+const API_BASE = (typeof window !== "undefined" && window.API_BASE) ? window.API_BASE : "";
 
 // Local helpers
 
@@ -79,10 +79,64 @@ const FeedbackService = {
   // Toggle upvote / un-upvote
   async toggleUpvote(id) {
     try {
-      await fetch(API_BASE + `/api/feedback/${id}/upvote`, { method: "POST", credentials: 'include' });
+      const res = await fetch(API_BASE + `/api/feedback/${id}/upvote`, { method: "POST", credentials: 'include' });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Could not upvote");
+      return data;
     } catch (err) {
       console.warn('Upvote API failed, using local toggle. Error:', err && err.message);
       toggleLocalUpvote(id);
+      return { ok: true };
     }
+  },
+
+  async toggleLike(id) {
+    const res = await fetch(API_BASE + `/api/feedback/${id}/like`, {
+      method: "POST",
+      credentials: "include"
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Could not like");
+    return data;
+  },
+
+  async getComments(id) {
+    const res = await fetch(API_BASE + `/api/feedback/${id}/comments`, {
+      credentials: "include"
+    });
+    if (!res.ok) throw new Error("Could not load comments");
+    return await res.json();
+  },
+
+  async addComment(id, text) {
+    const res = await fetch(API_BASE + `/api/feedback/${id}/comments`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ text })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Could not add comment");
+    return data;
+  },
+
+  async getUpdates(id) {
+    const res = await fetch(API_BASE + `/api/feedback/${id}/updates`, {
+      credentials: "include"
+    });
+    if (!res.ok) throw new Error("Could not load updates");
+    return await res.json();
+  },
+
+  async addUpdate(id, content) {
+    const res = await fetch(API_BASE + `/api/feedback/${id}/update`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
+      body: JSON.stringify({ content })
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.message || "Could not add update");
+    return data;
   }
 };

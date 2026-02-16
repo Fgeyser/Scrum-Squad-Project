@@ -6,6 +6,8 @@
   const STORAGE_KEY = "scrumSquad_notifications_v1";
   const MAX_ITEMS = 50;
   const CHANNEL_NAME = "scrumSquad_notifications_channel";
+  const SERVER_PREFIX = "srv_";
+  const SERVER_POLL_MS = 10000;
 
   const bc =
     "BroadcastChannel" in window ? new BroadcastChannel(CHANNEL_NAME) : null;
@@ -35,6 +37,39 @@
       STORAGE_KEY,
       JSON.stringify(items.slice(0, MAX_ITEMS)),
     );
+  }
+
+  function isServerItem(item) {
+    return !!(item && typeof item.id === "string" && item.id.startsWith(SERVER_PREFIX));
+  }
+
+  function mergeServerItems(serverItems) {
+    const serverMapped = (serverItems || []).map((n) => ({
+      id: SERVER_PREFIX + String(n.id),
+      serverId: Number(n.id),
+      ts: n.ts || nowISO(),
+      title: n.title || "Notification",
+      message: n.message || "",
+      href: "feed.html",
+      level: "info",
+      read: !!n.read,
+    }));
+    saveAll(serverMapped.slice(0, MAX_ITEMS));
+  }
+
+  async function fetchServerNotifications() {
+    try {
+      const who = await fetch("/api/whoami", { credentials: "include" });
+      const whoData = await who.json();
+      if (!whoData.ok || !whoData.user) return;
+      const res = await fetch("/api/notifications", { credentials: "include" });
+      if (!res.ok) return;
+      const list = await res.json();
+      mergeServerItems(Array.isArray(list) ? list : []);
+      renderAll();
+    } catch {
+      // keep local-only behavior if backend notifications are unavailable
+    }
   }
 
   function add(item) {
@@ -67,6 +102,9 @@
 
   // --- UI Mount (navbar bell + panel) ---
   function mountNavbar() {
+    // One-time cleanup of legacy local notifications so the bell stays user-specific.
+    saveAll(loadAll().filter((x) => isServerItem(x)));
+
     // Find navbar-links container on any page that has the navbar layout
     const links = document.querySelector(".navbar .navbar-links");
     if (!links) return;
@@ -105,7 +143,10 @@
       e.stopPropagation();
       const isOpen = panel.style.display !== "none";
       panel.style.display = isOpen ? "none" : "block";
-      if (!isOpen) renderAll();
+      if (!isOpen) {
+        renderAll();
+        fetchServerNotifications();
+      }
     });
 
     // Click outside closes panel
@@ -118,8 +159,14 @@
     panel.addEventListener("click", (e) => e.stopPropagation());
 
     // Clear all
-    document.getElementById("notifClearBtn").addEventListener("click", () => {
+    document.getElementById("notifClearBtn").addEventListener("click", async () => {
       saveAll([]);
+      try {
+        await fetch("/api/notifications", {
+          method: "DELETE",
+          credentials: "include",
+        });
+      } catch {}
       broadcast({ type: "cleared" });
       renderAll();
     });
@@ -127,14 +174,22 @@
     // Mark all read
     document
       .getElementById("notifMarkReadBtn")
-      .addEventListener("click", () => {
+      .addEventListener("click", async () => {
         const items = loadAll().map((n) => ({ ...n, read: true }));
-        saveAll(items);
+        saveAll(items);        
+        try {
+          await fetch("/api/notifications/mark-all-read", {
+            method: "POST",
+            credentials: "include",
+          });
+        } catch {}
         broadcast({ type: "markAllRead" });
         renderAll();
       });
 
     renderAll();
+    fetchServerNotifications();
+    setInterval(fetchServerNotifications, SERVER_POLL_MS);
   }
 
   function renderAll() {
@@ -192,7 +247,16 @@
         const id = el.getAttribute("data-id");
 
         // Dismiss
-        el.querySelector(".notif-item-x").addEventListener("click", () => {
+        el.querySelector(".notif-item-x").addEventListener("click", async () => {
+          const target = loadAll().find((x) => x.id === id);
+          if (target && isServerItem(target) && typeof target.serverId === "number") {
+            try {
+              await fetch(`/api/notifications/${target.serverId}`, {
+                method: "DELETE",
+                credentials: "include",
+              });
+            } catch {}
+          }
           const items2 = loadAll().filter((x) => x.id !== id);
           saveAll(items2);
           broadcast({ type: "removed", id });
@@ -200,7 +264,16 @@
         });
 
         // Mark read
-        el.querySelector(".notif-readbtn").addEventListener("click", () => {
+        el.querySelector(".notif-readbtn").addEventListener("click", async () => {
+          const target = loadAll().find((x) => x.id === id);
+          if (target && isServerItem(target) && typeof target.serverId === "number") {
+            try {
+              await fetch(`/api/notifications/${target.serverId}/read`, {
+                method: "POST",
+                credentials: "include",
+              });
+            } catch {}
+          }
           const items2 = loadAll().map((x) =>
             x.id === id ? { ...x, read: true } : x,
           );
@@ -229,9 +302,25 @@
     const node = document.createElement("div");
     node.className = "toast";
     node.innerHTML = `
-      <div class="toast-title">${escapeHtml(item.title || "Notification")}</div>
+      <div class="toast-head">
+        <div class="toast-title">${escapeHtml(item.title || "Notification")}</div>
+        <button class="toast-x" type="button" aria-label="Dismiss">✕</button>
+      </div>
       <div class="toast-msg">${escapeHtml(item.message || "")}</div>
     `;
+
+    const dismiss = () => {
+      node.classList.add("hide");
+      setTimeout(() => node.remove(), 250);
+    };
+
+    const closeBtn = node.querySelector(".toast-x");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dismiss();
+      });
+    }
 
     // Click toast -> open link if provided
     if (item.href) {
@@ -245,8 +334,7 @@
 
     // Auto-remove
     setTimeout(() => {
-      node.classList.add("hide");
-      setTimeout(() => node.remove(), 250);
+      dismiss();
     }, 3000);
   }
 
@@ -254,7 +342,25 @@
   window.NotificationService = {
     mountNavbar,
 
-    notify({ title, message, href, level } = {}) {
+    notify({ title, message, href, level, persist } = {}) {
+      const item = {
+        id: uid(),
+        ts: nowISO(),
+        title: title || "Notification",
+        message: message || "",
+        href: href || "",
+        level: level || "info",
+        read: false,
+      };
+      if (persist) {
+        add(item);
+        return;
+      }
+      toast(item);
+    },
+
+    // explicit bell notification (rare; server notifications preferred)
+    notifyBell({ title, message, href, level } = {}) {
       add({
         id: uid(),
         ts: nowISO(),

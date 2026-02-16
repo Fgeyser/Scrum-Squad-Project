@@ -593,6 +593,31 @@ textarea:focus {
   margin-bottom: 0.25rem;
 }
 
+.toast-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.toast-x {
+  margin: 0;
+  padding: 0;
+  width: 22px;
+  height: 22px;
+  border: none;
+  border-radius: 999px;
+  background: transparent;
+  color: #6b7280;
+  font-size: 0.9rem;
+  line-height: 1;
+}
+
+.toast-x:hover {
+  background: #f3f4f6;
+  color: #374151;
+}
+
 .toast-msg {
   color: var(--muted-text);
   font-size: 0.9rem;
