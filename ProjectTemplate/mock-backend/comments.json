@@ -1,0 +1,90 @@
+[
+  {
+    "id": 1771202186442,
+    "postId": 1770511382833,
+    "text": "Testing points comment",
+    "author": "Employee One",
+    "authorPublicId": "user-kfiagi",
+    "timestamp": "2026-02-16T00:36:26.442Z"
+  },
+  {
+    "id": 1771211326202,
+    "postId": 1771211326085,
+    "text": "Great idea",
+    "author": "Employee One",
+    "authorPublicId": "user-kfiagi",
+    "timestamp": "2026-02-16T03:08:46.202Z"
+  },
+  {
+    "id": 1771211493012,
+    "postId": 1771211454875,
+    "text": "This comment will give you 3 points!!",
+    "author": "Sam",
+    "authorPublicId": "user-gjgepf",
+    "timestamp": "2026-02-16T03:11:33.012Z"
+  },
+  {
+    "id": 1771212050347,
+    "postId": 1771212050167,
+    "text": "nice post",
+    "author": "Actor One",
+    "authorPublicId": "user-azplnj",
+    "timestamp": "2026-02-16T03:20:50.347Z"
+  },
+  {
+    "id": 1771212422943,
+    "postId": 1771212050167,
+    "text": "Awesome",
+    "author": "Kevin",
+    "authorPublicId": "user-1e83ei",
+    "timestamp": "2026-02-16T03:27:02.943Z"
+  },
+  {
+    "id": 1771212923780,
+    "postId": 1771211454875,
+    "text": "free 3 points!!",
+    "author": "gg",
+    "authorPublicId": "user-suvllq",
+    "timestamp": "2026-02-16T03:35:23.780Z"
+  },
+  {
+    "id": 1771213390134,
+    "postId": 1771213390041,
+    "text": "first",
+    "author": "Alpha",
+    "authorPublicId": "user-f3mqfo",
+    "timestamp": "2026-02-16T03:43:10.134Z"
+  },
+  {
+    "id": 1771213390157,
+    "postId": 1771213390041,
+    "text": "second",
+    "author": "Beta",
+    "authorPublicId": "user-z8745d",
+    "timestamp": "2026-02-16T03:43:10.157Z"
+  },
+  {
+    "id": 1771214599997,
+    "postId": 1771214599901,
+    "text": "nice",
+    "author": "Shop Actor",
+    "authorPublicId": "user-czi64o",
+    "timestamp": "2026-02-16T04:03:19.997Z"
+  },
+  {
+    "id": 1771282521461,
+    "postId": 1771282513332,
+    "text": "3 pts",
+    "author": "sam",
+    "authorPublicId": "user-q8ryc8",
+    "timestamp": "2026-02-16T22:55:21.461Z"
+  },
+  {
+    "id": 1771282565155,
+    "postId": 1771282513332,
+    "text": "3 pts",
+    "author": "g",
+    "authorPublicId": "user-oisvnc",
+    "timestamp": "2026-02-16T22:56:05.155Z"
+  }
+]

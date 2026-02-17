@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Login | Scrum Squad</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+        <a href="myPoints.html">My Points</a>
+        <a href="shop.html">Shop</a>
+        <a href="dataPage.html">Data</a>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <section class="card login-card" id="loginCard">
+        <h1>Welcome Back</h1>
+        <p id="loginSubtitle">Please log in to continue to your dashboard.</p>
+
+        <form id="loginForm" class="auth-form" onsubmit="loginSubmit(event)">
+          <div class="form-group">
+            <label for="username">Username</label>
+            <input id="username" type="text" autocomplete="username" required />
+          </div>
+          <div class="form-group">
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" required />
+          </div>
+          <div id="loginMessage" class="form-message"></div>
+          <button type="submit" class="primary-btn full-width">Login</button>
+          <button type="button" class="secondary-btn full-width" onclick="showSignup()">Create Account</button>
+        </form>
+
+        <form id="signupSection" class="auth-form" style="display:none;" onsubmit="signupSubmit(event)">
+          <div class="form-group">
+            <label for="signup_display">Display name</label>
+            <input id="signup_display" type="text" required />
+          </div>
+          <div class="form-group">
+            <label for="signup_username">Username</label>
+            <input id="signup_username" type="text" autocomplete="username" required />
+          </div>
+          <div class="form-group">
+            <label for="signup_password">Password</label>
+            <input id="signup_password" type="password" autocomplete="new-password" required />
+          </div>
+          <div class="form-group">
+            <label for="signup_password_confirm">Confirm password</label>
+            <input id="signup_password_confirm" type="password" autocomplete="new-password" required />
+          </div>
+          <div id="signupMessage" class="form-message"></div>
+          <button type="submit" class="primary-btn full-width">Sign Up</button>
+          <button type="button" class="secondary-btn full-width" onclick="showLogin()">Back to Login</button>
+        </form>
+
+        <div id="alreadyLoggedIn" class="auth-form" style="display:none;">
+          <h2 class="section-title">You are logged in</h2>
+          <p id="loggedInAs"></p>
+          <button type="button" class="secondary-btn" id="goToFeedBtn">Go to Feed</button>
+          <button type="button" class="secondary-btn" id="logoutBtn">Logout</button>
+        </div>
+      </section>
+    </main>
+
+    <div class="footer">© 2026 Scrum Squad Project Team. All rights reserved.</div>
+
+    <script src="JavaScript/loginService.js"></script>
+    <script src="JavaScript/navbarEffects.js"></script>
+</body>
+</html>

@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Scrum Squad Feed</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="navbar">
+      <div class="navbar-title">Scrum Squad</div>
+      <div class="navbar-links">
+        <a href="index.html">Home</a>
+        <a href="about.html">About</a>
+        <a href="login.html">Login</a>
+        <a href="feed.html">Feed</a>
+        <a href="myPoints.html">My Points</a>
+        <a href="shop.html">Shop</a>
+        <a href="dataPage.html">Data</a>
+      </div>
+    </div>
+
+    <main class="main-content">
+      <div class="feed-wrapper">
+        <div class="feed-toolbar">
+          <div>
+            <label for="sortSelect">Sort by:</label>
+            <select id="sortSelect" onchange="changeSort()">
+              <option value="recent">Most Recent</option>
+              <option value="upvotes">Most Upvoted</option>
+              <option value="date">Oldest First</option>
+            </select>
+          </div>
+          <div class="points-summary">
+            <strong>Points: <span id="pointsValue">0</span></strong>
+            <span id="pointsRules">On your posts: +3 comment, +2 upvote, +1 like</span>
+          </div>
+        </div>
+
+        <div class="feed-scroll" id="feedList"></div>
+      </div>
+    </main>
+
+    <button class="post-button primary-btn" onclick="openModal()">Give Feedback</button>
+
+    <div class="modal-overlay" id="modalOverlay">
+      <div class="modal">
+        <h2>Give Feedback</h2>
+        <div class="form-group">
+          <label for="issue">Issue</label>
+          <input type="text" id="issue" placeholder="What is the issue?" />
+        </div>
+
+        <div class="form-group">
+          <label for="theme">Category</label>
+          <select id="theme">
+            <option value="Tech Issue">Tech Issue</option>
+            <option value="Team Structure">Team Structure</option>
+            <option value="Process">Process</option>
+            <option value="Communication">Communication</option>
+            <option value="Management">Management</option>
+            <option value="Other">Other</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="impact">Impact</label>
+          <textarea id="impact" placeholder="What impact does this have?"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="suggestion">Suggestion</label>
+          <textarea id="suggestion" placeholder="What do you suggest?"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button class="secondary-btn" onclick="closeModal()">Cancel</button>
+          <button class="primary-btn" onclick="submitFeedback()">Post</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">© 2026 Scrum Squad Project Team. All rights reserved.</div>
+
+    <script src="JavaScript/feedbackService.js"></script>
+    <script src="JavaScript/notificationService.js"></script>
+    <script src="JavaScript/feedRenderer.js"></script>
+    <script src="JavaScript/feedController.js"></script>
+    <script src="JavaScript/navbarEffects.js"></script>
+</body>
+</html>

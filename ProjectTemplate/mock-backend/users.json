@@ -1,0 +1,69 @@
+[
+  {
+    "username": "employee1",
+    "password": "password123",
+    "displayName": "Employee One",
+    "publicId": "user-3u15wh",
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "alice",
+    "password": "alicepass",
+    "displayName": "Alice Example",
+    "publicId": "user-6atnw8",
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "sulek",
+    "password": "sulek123",
+    "displayName": "Sam",
+    "publicId": "user-8iq75t",
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "sam",
+    "password": "aaaaaa",
+    "displayName": "sam",
+    "publicId": "user-q8ryc8",
+    "isAdmin": false,
+    "points": 1,
+    "earnedPoints": 6,
+    "spentPoints": 5
+  },
+  {
+    "username": "g",
+    "password": "gggggg",
+    "displayName": "g",
+    "publicId": "user-oisvnc",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "signup_test_user_2",
+    "password": "pass123",
+    "displayName": "Signup Test",
+    "publicId": "user-tlrq0p",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  },
+  {
+    "username": "signup_test_user_3",
+    "password": "pass123",
+    "displayName": "Signup Test",
+    "publicId": "user-0frury",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
+  }
+]

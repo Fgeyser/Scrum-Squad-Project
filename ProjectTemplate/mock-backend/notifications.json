@@ -1,0 +1,172 @@
+[
+  {
+    "id": 1771214600060,
+    "userPublicId": "user-tbahsf",
+    "postId": 1771214599901,
+    "type": "comment",
+    "title": "New interaction",
+    "message": "Shop Actor commented on your post \"shop test\".",
+    "ts": "2026-02-16T04:03:19.997Z",
+    "read": false
+  },
+  {
+    "id": 1771214600780,
+    "userPublicId": "user-tbahsf",
+    "postId": 1771214599901,
+    "type": "upvote",
+    "title": "New interaction",
+    "message": "Shop Actor upvoted your post \"shop test\".",
+    "ts": "2026-02-16T04:03:19.988Z",
+    "read": false
+  },
+  {
+    "id": 1771214600068,
+    "userPublicId": "user-tbahsf",
+    "postId": 1771214599901,
+    "type": "like",
+    "title": "New interaction",
+    "message": "Shop Actor liked your post \"shop test\".",
+    "ts": "2026-02-16T04:03:19.981Z",
+    "read": false
+  },
+  {
+    "id": 1771213390446,
+    "userPublicId": "user-f3mqfo",
+    "postId": 1771213390041,
+    "type": "comment-reply",
+    "title": "New reply",
+    "message": "Beta replied on a post you commented on: \"Thread notif test\".",
+    "ts": "2026-02-16T03:43:10.157Z",
+    "read": false
+  },
+  {
+    "id": 1771213390207,
+    "userPublicId": "user-ang4go",
+    "postId": 1771213390041,
+    "type": "comment",
+    "title": "New interaction",
+    "message": "Beta commented on your post \"Thread notif test\".",
+    "ts": "2026-02-16T03:43:10.157Z",
+    "read": false
+  },
+  {
+    "id": 1771213390511,
+    "userPublicId": "user-ang4go",
+    "postId": 1771213390041,
+    "type": "comment",
+    "title": "New interaction",
+    "message": "Alpha commented on your post \"Thread notif test\".",
+    "ts": "2026-02-16T03:43:10.134Z",
+    "read": false
+  },
+  {
+    "id": 1771212924147,
+    "userPublicId": "user-gjgepf",
+    "postId": 1771211454875,
+    "type": "comment",
+    "title": "New interaction",
+    "message": "gg commented on your post \"Notification test\".",
+    "ts": "2026-02-16T03:35:23.781Z",
+    "read": false
+  },
+  {
+    "id": 1771212913971,
+    "userPublicId": "user-gjgepf",
+    "postId": 1771211454875,
+    "type": "like",
+    "title": "New interaction",
+    "message": "gg liked your post \"Notification test\".",
+    "ts": "2026-02-16T03:35:13.559Z",
+    "read": false
+  },
+  {
+    "id": 1771212913177,
+    "userPublicId": "user-gjgepf",
+    "postId": 1771211454875,
+    "type": "upvote",
+    "title": "New interaction",
+    "message": "gg upvoted your post \"Notification test\".",
+    "ts": "2026-02-16T03:35:13.111Z",
+    "read": false
+  },
+  {
+    "id": 1771212423663,
+    "userPublicId": "user-ckf3kf",
+    "postId": 1771212050167,
+    "type": "comment",
+    "title": "New interaction",
+    "message": "Kevin commented on your post \"Points owner test\".",
+    "ts": "2026-02-16T03:27:02.945Z",
+    "read": false
+  },
+  {
+    "id": 1771212414815,
+    "userPublicId": "user-ckf3kf",
+    "postId": 1771212050167,
+    "type": "like",
+    "title": "New interaction",
+    "message": "Kevin liked your post \"Points owner test\".",
+    "ts": "2026-02-16T03:26:54.560Z",
+    "read": false
+  },
+  {
+    "id": 1771212414295,
+    "userPublicId": "user-ckf3kf",
+    "postId": 1771212050167,
+    "type": "upvote",
+    "title": "New interaction",
+    "message": "Kevin upvoted your post \"Points owner test\".",
+    "ts": "2026-02-16T03:26:53.517Z",
+    "read": false
+  },
+  {
+    "id": 1771212050782,
+    "userPublicId": "user-ckf3kf",
+    "postId": 1771212050167,
+    "type": "upvote",
+    "title": "New interaction",
+    "message": "Actor Two upvoted your post \"Points owner test\".",
+    "ts": "2026-02-16T03:20:50.362Z",
+    "read": false
+  },
+  {
+    "id": 1771212050868,
+    "userPublicId": "user-ckf3kf",
+    "postId": 1771212050167,
+    "type": "comment",
+    "title": "New interaction",
+    "message": "Actor One commented on your post \"Points owner test\".",
+    "ts": "2026-02-16T03:20:50.347Z",
+    "read": false
+  },
+  {
+    "id": 1771212050810,
+    "userPublicId": "user-ckf3kf",
+    "postId": 1771212050167,
+    "type": "like",
+    "title": "New interaction",
+    "message": "Actor One liked your post \"Points owner test\".",
+    "ts": "2026-02-16T03:20:50.333Z",
+    "read": false
+  },
+  {
+    "id": 1771211326516,
+    "userPublicId": "user-d9nmq4",
+    "postId": 1771211326085,
+    "type": "like",
+    "title": "New interaction",
+    "message": "Employee One liked your post \"Notif test post\".",
+    "ts": "2026-02-16T03:08:46.183Z",
+    "read": false
+  },
+  {
+    "id": 1771211326370,
+    "userPublicId": "user-d9nmq4",
+    "postId": 1771211326085,
+    "type": "upvote",
+    "title": "New interaction",
+    "message": "Employee One upvoted your post \"Notif test post\".",
+    "ts": "2026-02-16T03:08:46.173Z",
+    "read": false
+  }
+]
