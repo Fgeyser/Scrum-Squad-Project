@@ -102,11 +102,15 @@
     </Compile>
     <Compile Include="ProjectServices.asmx.cs">
       <DependentUpon>ProjectServices.asmx</DependentUpon>
-      <SubType>Component</SubType>
     </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\FeedbackStorage.cs" />
+    <Compile Include="Services\ThemeMapper.cs" />
+    <Compile Include="Services\ThemeStorage.cs" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="App_Data\feedback.json" />
+    <Content Include="App_Data\themes.json" />
     <None Include="packages.config" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
