@@ -444,18 +444,24 @@ app.post('/api/employeeLogin', (req, res) => {
     return res.status(401).json({ ok: false, message: 'Invalid credentials' });
   }
 
+  // Recalculate user points based on current feedback/comments before login
+  recalculateAllUserPoints();
+  
+  // Get fresh user data after recalculation
+  const freshUser = demoUsers.find(u => u.username === username);
+  
   // store minimal user in session
   // do NOT expose internal username to the frontend; use a publicId and a display name
   req.session.user = {
-    publicId: user.publicId,
-    displayName: user.displayName,
-    username: user.username,
-    isAdmin: !!(user.isAdmin || user.role === 'admin'),
-    points: user.points || 0,
-    earnedPoints: user.earnedPoints || 0,
-    spentPoints: user.spentPoints || 0
+    publicId: freshUser.publicId,
+    displayName: freshUser.displayName,
+    username: freshUser.username,
+    isAdmin: !!(freshUser.isAdmin || freshUser.role === 'admin'),
+    points: freshUser.points || 0,
+    earnedPoints: freshUser.earnedPoints || 0,
+    spentPoints: freshUser.spentPoints || 0
   };
-  logInfo('login_success', req, { username: user.username });
+  logInfo('login_success', req, { username: freshUser.username });
   res.json({ ok: true, user: req.session.user });
 });
 
@@ -661,18 +667,29 @@ app.delete('/api/notifications', requireAuth, (req, res) => {
 
 app.get('/api/whoami', (req, res) => {
   if (req.session && req.session.user) {
-    // find stored user to expose admin flag
+    // Recalculate all user points to ensure they're up-to-date
+    recalculateAllUserPoints();
+    
+    // find stored user to expose admin flag and get fresh points
     const stored = demoUsers.find(u => u.username === req.session.user.username);
     const isAdmin = !!(stored && (stored.isAdmin || stored.role === 'admin'));
     const points = stored ? (stored.points || 0) : (req.session.user.points || 0);
     const earnedPoints = stored ? (stored.earnedPoints || 0) : (req.session.user.earnedPoints || 0);
     const spentPoints = stored ? (stored.spentPoints || 0) : (req.session.user.spentPoints || 0);
+    
+    // Update session with fresh values
+    req.session.user = { ...req.session.user, isAdmin, points, earnedPoints, spentPoints };
+    
     return res.json({ ok: true, user: { ...req.session.user, isAdmin, points, earnedPoints, spentPoints } });
   }
   res.json({ ok: false });
 });
 
 app.get('/api/my-points', requireAuth, (req, res) => {
+  // Recalculate points to ensure fresh data
+  recalculateAllUserPoints();
+  refreshSessionPoints(req);
+  
   const breakdown = getPointsBreakdownForUser(req.session.user.publicId);
   const stored = getCurrentStoredUser(req);
   const spentPoints = stored ? (stored.spentPoints || 0) : 0;

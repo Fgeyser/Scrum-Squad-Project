@@ -65,5 +65,15 @@
     "points": 0,
     "earnedPoints": 0,
     "spentPoints": 0
+  },
+  {
+    "username": "Admin",
+    "password": "adminpass",
+    "displayName": "Admin User",
+    "publicId": "user-admin",
+    "isAdmin": true,
+    "points": 100,
+    "earnedPoints": 100,
+    "spentPoints": 0
   }
 ]

@@ -39,7 +39,7 @@ async function loadShop() {
     try {
       meData = await FeedbackService.getShopMe();
     } catch (err) {
-      statusEl.textContent = 'Log in to redeem items.';
+      statusEl.textContent = 'Log in to add items to cart.';
       renderHistory(null);
     }
 
@@ -54,7 +54,7 @@ async function loadShop() {
         <div class="shop-item-body">
           <h3>${item.name}</h3>
           <p>${item.cost} points</p>
-          <button class="primary-btn redeem-btn" type="button" ${!meData || points < item.cost ? 'disabled' : ''}>Redeem</button>
+          <button class="primary-btn cart-add-btn" type="button">Add to Cart</button>
         </div>
       </article>
     `).join('');
@@ -62,32 +62,31 @@ async function loadShop() {
     grid.querySelectorAll('.shop-item').forEach((card) => {
       const id = card.getAttribute('data-id');
       const cost = Number(card.getAttribute('data-cost')) || 0;
-      const btn = card.querySelector('.redeem-btn');
-      btn.addEventListener('click', async () => {
+      const name = card.querySelector('h3').textContent;
+      const btn = card.querySelector('.cart-add-btn');
+      
+      btn.addEventListener('click', async (e) => {
+        e.preventDefault();
         if (!meData) {
-          statusEl.textContent = 'Please log in to redeem.';
-          return;
-        }
-        const available = Number(pointsEl.textContent) || 0;
-        if (available < cost) {
-          statusEl.textContent = "Can't redeem. Not enough points.";
+          statusEl.textContent = 'Please log in to add items to cart.';
           return;
         }
 
-        btn.disabled = true;
-        statusEl.textContent = '';
-        try {
-          const result = await FeedbackService.redeem(id);
-          pointsEl.textContent = String(result.points || 0);
-          statusEl.textContent = `Redeemed ${result.redemption.itemName} for ${result.redemption.cost} points.`;
-          if (window.NotificationService) NotificationService.success(statusEl.textContent);
-          await loadShop();
-        } catch (err) {
-          const msg = (err && err.message) ? err.message : '';
-          statusEl.textContent = /enough points/i.test(msg)
-            ? "Can't redeem. Not enough points."
-            : (msg || 'Could not redeem this item.');
-          btn.disabled = false;
+        // Add item to cart
+        CartService.addItem(id, name, cost);
+        statusEl.textContent = `Added ${name} to cart!`;
+        if (window.NotificationService) {
+          NotificationService.success(`Added ${name} to cart!`);
+        }
+
+        // Open the settings panel with cart visible
+        const settingsCog = document.getElementById('settingsCogBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
+        if (settingsCog && settingsPanel) {
+          settingsPanel.style.display = 'block';
+          if (window.SettingsPanel && window.SettingsPanel.render) {
+            await window.SettingsPanel.render();
+          }
         }
       });
     });
@@ -99,3 +98,4 @@ async function loadShop() {
 }
 
 document.addEventListener('DOMContentLoaded', loadShop);
+window.loadShop = loadShop;

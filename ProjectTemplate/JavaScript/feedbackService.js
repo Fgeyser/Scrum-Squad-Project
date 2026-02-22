@@ -1,4 +1,4 @@
-const API_BASE = window.API_BASE || 'http://localhost:8001';
+const API_BASE = window.API_BASE || 'http://localhost:8000';
 
 async function parseJsonResponse(resp) {
   const data = await resp.json().catch(() => ({}));
