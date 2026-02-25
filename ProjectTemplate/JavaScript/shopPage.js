@@ -15,15 +15,48 @@ function renderHistory(redemptions) {
   }
 
   hintEl.textContent = '';
-  listEl.innerHTML = redemptions.map((r) => `
-    <article class="history-item">
+  listEl.innerHTML = redemptions.map((r) => {
+    const refunded = !!r.refunded;
+    const ts = new Date(r.ts).toLocaleString();
+    let refundInfo = '';
+    if (refunded) {
+      const when = r.refundedTs ? new Date(r.refundedTs).toLocaleString() : '';
+      refundInfo = `<div class="history-refunded">Refunded${when ? ' ' + when : ''}</div>`;
+    }
+    const button = refunded ? '' : `<button class="refund-btn" data-id="${r.id}">Refund</button>`;
+    return `
+    <article class="history-item${refunded ? ' history-item-refunded' : ''}">
       <div>
         <strong>${r.itemName}</strong>
-        <div class="history-meta">${new Date(r.ts).toLocaleString()}</div>
+        <div class="history-meta">${ts}${refundInfo ? '<br/>' + refundInfo : ''}</div>
       </div>
-      <div class="history-cost">${r.cost} pts</div>
+      <div class="history-cost">${r.cost} pts${refunded ? ' (refunded)' : ''}</div>
+      ${button}
     </article>
-  `).join('');
+  `;
+  }).join('');
+
+  // attach refund handlers
+  listEl.querySelectorAll('.refund-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      e.preventDefault();
+      const redemptionId = btn.getAttribute('data-id');
+      const statusEl = document.getElementById('shopStatus');
+      try {
+        const resp = await FeedbackService.refund(redemptionId);
+        await loadShop();
+        statusEl.textContent = `Refunded ${resp.redemption.itemName}.`;
+        if (window.NotificationService) {
+          NotificationService.success(`Refunded ${resp.redemption.itemName}.`);
+        }
+      } catch (err) {
+        statusEl.textContent = err.message || 'Refund failed.';
+        if (window.NotificationService) {
+          NotificationService.error(err.message || 'Refund failed.');
+        }
+      }
+    });
+  });
 }
 
 async function loadShop() {

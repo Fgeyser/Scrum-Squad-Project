@@ -6,15 +6,17 @@
     "suggestion": "a",
     "theme": "Tech Issue",
     "createdAt": "2026-02-16T22:55:13.332Z",
-    "upvotes": 2,
-    "likes": 2,
+    "upvotes": 3,
+    "likes": 3,
     "upvotedBy": [
       "user-q8ryc8",
-      "user-oisvnc"
+      "user-oisvnc",
+      "user-3u15wh"
     ],
     "likedBy": [
       "user-q8ryc8",
-      "user-oisvnc"
+      "user-oisvnc",
+      "user-3u15wh"
     ],
     "author": "user-q8ryc8"
   },
@@ -25,13 +27,16 @@
     "suggestion": "y",
     "theme": "Other",
     "createdAt": "2026-02-16T04:03:19.901Z",
-    "upvotes": 1,
-    "likes": 1,
+    "upvotes": 3,
+    "likes": 2,
     "upvotedBy": [
-      "user-czi64o"
+      "user-czi64o",
+      "user-q8ryc8",
+      "user-3u15wh"
     ],
     "likedBy": [
-      "user-czi64o"
+      "user-czi64o",
+      "user-q8ryc8"
     ],
     "author": "user-tbahsf"
   },
@@ -42,10 +47,14 @@
     "suggestion": "y",
     "theme": "Process",
     "createdAt": "2026-02-16T03:43:10.041Z",
-    "upvotes": 0,
-    "likes": 0,
-    "upvotedBy": [],
-    "likedBy": [],
+    "upvotes": 1,
+    "likes": 1,
+    "upvotedBy": [
+      "user-q8ryc8"
+    ],
+    "likedBy": [
+      "user-q8ryc8"
+    ],
     "author": "user-ang4go"
   },
   {
@@ -55,15 +64,18 @@
     "suggestion": "suggestion",
     "theme": "Process",
     "createdAt": "2026-02-16T03:20:50.167Z",
-    "upvotes": 2,
-    "likes": 2,
+    "upvotes": 3,
+    "likes": 4,
     "upvotedBy": [
       "user-knatse",
-      "user-1e83ei"
+      "user-1e83ei",
+      "user-q8ryc8"
     ],
     "likedBy": [
       "user-azplnj",
-      "user-1e83ei"
+      "user-1e83ei",
+      "user-q8ryc8",
+      "user-3u15wh"
     ],
     "author": "user-ckf3kf"
   },

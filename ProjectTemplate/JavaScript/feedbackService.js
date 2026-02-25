@@ -144,5 +144,15 @@ const FeedbackService = {
       body: JSON.stringify({ itemId })
     });
     return parseJsonResponse(resp);
+  },
+
+  async refund(redemptionId) {
+    const resp = await fetch(API_BASE + '/api/shop/refund', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ redemptionId })
+    });
+    return parseJsonResponse(resp);
   }
 };

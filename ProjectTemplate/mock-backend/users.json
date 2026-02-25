@@ -32,8 +32,8 @@
     "displayName": "sam",
     "publicId": "user-q8ryc8",
     "isAdmin": false,
-    "points": 1,
-    "earnedPoints": 6,
+    "points": 4,
+    "earnedPoints": 9,
     "spentPoints": 5
   },
   {
@@ -72,8 +72,8 @@
     "displayName": "Admin User",
     "publicId": "user-admin",
     "isAdmin": true,
-    "points": 100,
-    "earnedPoints": 100,
+    "points": 0,
+    "earnedPoints": 0,
     "spentPoints": 0
   }
 ]

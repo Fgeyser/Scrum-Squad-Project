@@ -713,7 +713,12 @@ app.get('/api/shop/me', requireAuth, (req, res) => {
   const mine = redemptionsList
     .filter(r => r.userPublicId === req.session.user.publicId)
     .sort((a, b) => new Date(b.ts) - new Date(a.ts))
-    .slice(0, 100);
+    .slice(0, 100)
+    .map(r => ({
+      ...r,
+      refunded: !!r.refunded,
+      refundedTs: r.refundedTs || null
+    }));
   res.json({
     ok: true,
     points: stored ? (stored.points || 0) : 0,
@@ -755,7 +760,8 @@ app.post('/api/shop/redeem', requireAuth, asyncRoute(async (req, res) => {
       itemId: item.id,
       itemName: item.name,
       cost: item.cost,
-      ts: new Date().toISOString()
+      ts: new Date().toISOString(),
+      refunded: false
     };
     redemptionsList.unshift(redemption);
     redemptionsList = redemptionsList.slice(0, 1000);
@@ -774,6 +780,69 @@ app.post('/api/shop/redeem', requireAuth, asyncRoute(async (req, res) => {
   });
 
   if (response.body && response.body.ok) writeIdempotentRedemption(req, response.body);
+  return res.status(response.status).json(response.body);
+}));
+
+
+// Refund endpoint for shop purchases
+app.post('/api/shop/refund', requireAuth, asyncRoute(async (req, res) => {
+  const { redemptionId } = req.body || {};
+  if (!redemptionId) {
+    return res.status(400).json({ ok: false, message: 'Missing redemptionId.' });
+  }
+
+  const lockKey = `refund:${req.storedUser.publicId}`;
+  const response = await withLock(lockKey, async () => {
+    recalculateAllUserPoints();
+    const stored = getCurrentStoredUser(req);
+    if (!stored) return { status: 401, body: { ok: false, message: 'User not found.' } };
+
+    const idx = redemptionsList.findIndex(r => r.id === redemptionId && r.userPublicId === stored.publicId);
+    if (idx === -1) {
+      return { status: 404, body: { ok: false, message: 'Redemption not found.' } };
+    }
+
+    const redemption = redemptionsList[idx];
+    if (redemption.refunded) {
+      return { status: 400, body: { ok: false, message: 'Already refunded.' } };
+    }
+
+    // return spent points
+    stored.spentPoints = Math.max(0, (stored.spentPoints || 0) - redemption.cost);
+    recalculateAllUserPoints();
+    saveUsers();
+    updateSessionFromStoredUser(req, stored);
+
+    redemption.refunded = true;
+    redemption.refundedTs = new Date().toISOString();
+    saveRedemptions();
+
+    // create notification for user
+    notificationsList.unshift({
+      id: Date.now() + Math.floor(Math.random() * 1000),
+      userPublicId: stored.publicId,
+      type: 'refund',
+      title: 'Shop refund',
+      message: `Your purchase of "${redemption.itemName}" was refunded.`,
+      ts: new Date().toISOString(),
+      read: false
+    });
+    notificationsList = notificationsList.slice(0, 300);
+    saveNotifications();
+
+    logInfo('shop_refund_success', req, { redemptionId: redemption.id, cost: redemption.cost, pointsAfter: stored.points || 0 });
+
+    return {
+      status: 200,
+      body: {
+        ok: true,
+        redemption,
+        points: stored.points || 0,
+        spentPoints: stored.spentPoints || 0,
+        earnedPoints: stored.earnedPoints || 0
+      }
+    };
+  });
   return res.status(response.status).json(response.body);
 }));
 

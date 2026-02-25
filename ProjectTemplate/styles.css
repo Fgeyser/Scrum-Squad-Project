@@ -765,6 +765,29 @@ textarea:focus {
   color: #9aaccc;
 }
 
+.history-item-refunded {
+  opacity: 0.6;
+}
+
+.refund-btn {
+  border: 1px solid rgba(255, 99, 71, 0.6);
+  background: rgba(255, 99, 71, 0.25);
+  color: #fff;
+  padding: 0.3rem 0.6rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.refund-btn:hover {
+  background: rgba(255, 99, 71, 0.4);
+}
+
+.history-refunded {
+  font-size: 0.75rem;
+  color: var(--muted-text);
+}
+
 .history-meta {
   color: #9aaccc;
   font-size: 0.82rem;
@@ -1579,7 +1602,7 @@ textarea:focus {
   --background-color: #f8fafc;
   --card-bg: #ffffff;
   --text-color: #03045e;
-  --muted-text: #6b7280;
+  --muted-text: #374151; /* darker for readability */
   --border-radius: 10px;
   --transition-speed: 0.2s;
 }
@@ -1648,7 +1671,7 @@ textarea:focus {
 [data-theme="light"] .toast-msg,
 [data-theme="light"] .history-meta,
 [data-theme="light"] .shop-history-hint {
-  color: #6b7280;
+  color: #374151; /* darker than before */
 }
 
 [data-theme="light"] input[type="text"],
