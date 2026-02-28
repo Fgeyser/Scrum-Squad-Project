@@ -52,8 +52,8 @@ function renderFeed(container, posts, handlers, currentUser) {
       <div class="post-actions-row">
         <button class="upvote-btn ${post.viewerHasUpvoted ? 'active' : ''}" type="button">👍 ${post.upvotes || 0}</button>
         <button class="upvote-btn ${post.viewerHasLiked ? 'active' : ''}" type="button">❤️ ${post.likes || 0}</button>
-        <button class="secondary-btn comment-toggle" type="button">${post.commentsCount || 0} Comments</button>
-        <button class="secondary-btn updates-toggle" type="button">View Updates</button>
+        <button class="primary-btn comment-toggle" type="button">${post.commentsCount || 0} Comments</button>
+        <button class="primary-btn updates-toggle" type="button">View Updates</button>
       </div>
 
       <div class="comments-wrap" style="display:none;">

@@ -10,15 +10,34 @@
   }
 
   let mounted = false;
+  let lastKnownPoints = null;
+
+  function getFeedbackService() {
+    return typeof FeedbackService !== 'undefined' ? FeedbackService : null;
+  }
 
   async function fetchMyPoints() {
-    if (!window.FeedbackService) return null;
+    const service = getFeedbackService();
+    if (!service) return null;
     try {
-      const data = await FeedbackService.getMyPoints();
-      return data;
+      return await service.getMyPoints();
     } catch (err) {
-      return null;
+      try {
+        return await service.getShopMe();
+      } catch (fallbackErr) {
+        return null;
+      }
     }
+  }
+
+  function getDisplayPoints(pointsData) {
+    if (pointsData && typeof pointsData.points === 'number') {
+      lastKnownPoints = pointsData.points;
+    }
+    if (typeof lastKnownPoints === 'number') {
+      return lastKnownPoints;
+    }
+    return 0;
   }
 
   function ensureSettingsPanel() {
@@ -84,6 +103,7 @@
     const panel = document.getElementById('settingsPanel');
     const themeBtn = document.getElementById('themeToggleBtn');
     const redeemAllBtn = document.getElementById('cartRedeemAllBtn');
+    const cartListMini = document.getElementById('cartListMini');
 
     // Toggle panel visibility
     cog.addEventListener('click', async (e) => {
@@ -110,6 +130,25 @@
     redeemAllBtn.addEventListener('click', async (e) => {
       e.preventDefault();
       await redeemAllItems();
+    });
+
+    cartListMini.addEventListener('input', (e) => {
+      const input = e.target.closest('.cart-qty-input');
+      if (!input) return;
+      const id = input.getAttribute('data-id');
+      const qty = Math.max(1, parseInt(input.value, 10) || 1);
+      if (String(qty) !== input.value) {
+        input.value = String(qty);
+      }
+      CartService.updateQuantity(id, qty);
+    });
+
+    cartListMini.addEventListener('click', (e) => {
+      const btn = e.target.closest('.cart-remove-btn');
+      if (!btn) return;
+      e.preventDefault();
+      const id = btn.getAttribute('data-id');
+      CartService.removeItem(id);
     });
 
     mounted = true;
@@ -171,24 +210,6 @@
         </div>
       </div>
     `).join('');
-
-    // Add event listeners for quantity changes
-    cartListMini.querySelectorAll('.cart-qty-input').forEach((input) => {
-      input.addEventListener('change', (e) => {
-        const id = e.target.getAttribute('data-id');
-        const qty = Math.max(1, parseInt(e.target.value) || 1);
-        CartService.updateQuantity(id, qty);
-      });
-    });
-
-    // Add event listeners for remove buttons
-    cartListMini.querySelectorAll('.cart-remove-btn').forEach((btn) => {
-      btn.addEventListener('click', (e) => {
-        e.preventDefault();
-        const id = btn.getAttribute('data-id');
-        CartService.removeItem(id);
-      });
-    });
   }
 
   async function renderSettingsPanel() {
@@ -197,9 +218,9 @@
     if (pointsDisplay) {
       try {
         const pointsData = await fetchMyPoints();
-        if (pointsData) {
-          const pointsValue = document.getElementById('settingsPointsValue');
-          pointsValue.textContent = String(pointsData.points || 0);
+        const pointsValue = document.getElementById('settingsPointsValue');
+        if (pointsValue) {
+          pointsValue.textContent = String(getDisplayPoints(pointsData));
         }
       } catch (err) {
         // Silently fail
@@ -240,7 +261,11 @@
       for (const item of cart) {
         for (let i = 0; i < (item.quantity || 1); i++) {
           try {
-            await FeedbackService.redeem(item.id);
+            const service = getFeedbackService();
+            if (!service) {
+              throw new Error('Points service unavailable');
+            }
+            await service.redeem(item.id);
           } catch (err) {
             failedItems.push(item.name);
           }
@@ -295,6 +320,10 @@
   // Listen for cart updates
   window.addEventListener('cartUpdated', () => {
     updateCartBadge();
+    const panel = document.getElementById('settingsPanel');
+    if (panel && panel.style.display !== 'none') {
+      renderSettingsPanel();
+    }
   });
 
   // Listen for theme changes and update UI

@@ -97,7 +97,7 @@
     }
 
     list.innerHTML = items.map((n) => `
-      <div class="notif-item ${n.read ? '' : 'unread'}" data-id="${escapeHtml(n.id)}">
+      <div class="notif-item ${n.read ? '' : 'unread'} ${n.type ? `notif-item-${escapeHtml(n.type)}` : ''}" data-id="${escapeHtml(n.id)}">
         <div class="notif-item-top">
           <div class="notif-item-title">${escapeHtml(n.title || 'Notification')}</div>
           <button class="notif-item-x" type="button" aria-label="Dismiss">✕</button>
