@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Shop | Scrum Squad</title>
+    <title>Refunds | Scrum Squad</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
@@ -22,20 +22,23 @@
 
     <main class="main-content shop-main">
       <section class="shop-header card">
-        <h1>Rewards Shop</h1>
-        <p>Your available points: <strong id="shopPoints">0</strong></p>
-        <div id="shopStatus" class="form-message"></div>
+        <div class="shop-history-heading">
+          <div>
+            <h1>Refunds</h1>
+            <p>Refund redeemed products and receive your points back.</p>
+          </div>
+          <a href="shop.html" class="primary-btn shop-history-link">Back to Shop</a>
+        </div>
+        <p>Your available points: <strong id="refundPoints">0</strong></p>
+        <div id="refundStatus" class="form-message"></div>
       </section>
-
-      <section class="shop-grid" id="shopGrid"></section>
 
       <section class="shop-history card">
         <div class="shop-history-heading">
           <h2>Your Products</h2>
-          <a href="refunds.html" class="primary-btn shop-history-link">Open Refunds Page</a>
         </div>
-        <div id="shopHistoryHint" class="shop-history-hint">Log in to view redemption history.</div>
-        <div id="shopHistoryList" class="shop-history-list"></div>
+        <div id="refundHistoryHint" class="shop-history-hint">Log in to view your products.</div>
+        <div id="refundHistoryList" class="shop-history-list"></div>
       </section>
     </main>
 
@@ -43,10 +46,10 @@
 
     <script src="JavaScript/feedbackService.js"></script>
     <script src="JavaScript/notificationService.js"></script>
-    <script src="JavaScript/shopPage.js"></script>
+    <script src="JavaScript/refundsPage.js"></script>
     <script src="JavaScript/navbarEffects.js"></script>
     <script src="JavaScript/themeService.js"></script>
     <script src="JavaScript/cartService.js"></script>
     <script src="JavaScript/settingsPanel.js"></script>
-</body>
+  </body>
 </html>
