@@ -790,6 +790,7 @@ app.post('/api/shop/refund', requireAuth, asyncRoute(async (req, res) => {
   if (!redemptionId) {
     return res.status(400).json({ ok: false, message: 'Missing redemptionId.' });
   }
+  const normalizedRedemptionId = String(redemptionId);
 
   const lockKey = `refund:${req.storedUser.publicId}`;
   const response = await withLock(lockKey, async () => {
@@ -797,7 +798,7 @@ app.post('/api/shop/refund', requireAuth, asyncRoute(async (req, res) => {
     const stored = getCurrentStoredUser(req);
     if (!stored) return { status: 401, body: { ok: false, message: 'User not found.' } };
 
-    const idx = redemptionsList.findIndex(r => r.id === redemptionId && r.userPublicId === stored.publicId);
+    const idx = redemptionsList.findIndex(r => String(r.id) === normalizedRedemptionId && r.userPublicId === stored.publicId);
     if (idx === -1) {
       return { status: 404, body: { ok: false, message: 'Redemption not found.' } };
     }

@@ -1,5 +1,62 @@
 [
   {
+    "id": 1772250816358,
+    "userPublicId": "user-qqtxkn",
+    "type": "refund",
+    "title": "Shop refund",
+    "message": "Your purchase of \"Scrum Squad T-Shirt\" was refunded.",
+    "ts": "2026-02-28T03:53:36.098Z",
+    "read": false
+  },
+  {
+    "id": 1772250452974,
+    "userPublicId": "user-qqtxkn",
+    "type": "refund",
+    "title": "Shop refund",
+    "message": "Your purchase of \"Scrum Squad T-Shirt\" was refunded.",
+    "ts": "2026-02-28T03:47:32.491Z",
+    "read": false
+  },
+  {
+    "id": 1772249617178,
+    "userPublicId": "user-qqtxkn",
+    "type": "refund",
+    "title": "Shop refund",
+    "message": "Your purchase of \"Scrum Squad T-Shirt\" was refunded.",
+    "ts": "2026-02-28T03:33:36.810Z",
+    "read": false
+  },
+  {
+    "id": 1772248404656,
+    "userPublicId": "user-qqtxkn",
+    "postId": 1772248369513,
+    "type": "comment",
+    "title": "New interaction",
+    "message": "bbb commented on your post \"test\".",
+    "ts": "2026-02-28T03:13:24.133Z",
+    "read": false
+  },
+  {
+    "id": 1772248393644,
+    "userPublicId": "user-qqtxkn",
+    "postId": 1772248369513,
+    "type": "like",
+    "title": "New interaction",
+    "message": "bbb liked your post \"test\".",
+    "ts": "2026-02-28T03:13:12.792Z",
+    "read": false
+  },
+  {
+    "id": 1772248392762,
+    "userPublicId": "user-qqtxkn",
+    "postId": 1772248369513,
+    "type": "upvote",
+    "title": "New interaction",
+    "message": "bbb upvoted your post \"test\".",
+    "ts": "2026-02-28T03:13:11.952Z",
+    "read": false
+  },
+  {
     "id": 1771988101117,
     "userPublicId": "user-ckf3kf",
     "postId": 1771212050167,

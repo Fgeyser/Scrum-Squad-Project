@@ -75,5 +75,25 @@
     "points": 0,
     "earnedPoints": 0,
     "spentPoints": 0
+  },
+  {
+    "username": "aaa",
+    "password": "aaaaaa",
+    "displayName": "aaa",
+    "publicId": "user-qqtxkn",
+    "isAdmin": false,
+    "points": 6,
+    "earnedPoints": 6,
+    "spentPoints": 0
+  },
+  {
+    "username": "bbb",
+    "password": "bbbbbb",
+    "displayName": "bbb",
+    "publicId": "user-k67xtt",
+    "isAdmin": false,
+    "points": 0,
+    "earnedPoints": 0,
+    "spentPoints": 0
   }
 ]
