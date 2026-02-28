@@ -142,7 +142,7 @@ label,
 .notif-readbtn {
   border: 1px solid rgba(138, 161, 197, 0.28);
   background: rgba(93, 111, 139, 0.24);
-  color: #e5eeff;
+  color: #919db7;
 }
 
 .secondary-btn:hover,
@@ -699,12 +699,12 @@ textarea:focus {
 .points-box h3 {
   font-size: 0.95rem;
   margin-bottom: 0.35rem;
-  color: #d3def5 !important;
+  color: #8a96b5 !important;
 }
 
 .points-box p {
   font-size: 1.25rem;
-  color: #eef4ff !important;
+  color: #8a96b5 !important;
   font-weight: 700;
 }
 
@@ -1302,7 +1302,7 @@ textarea:focus {
 }
 
 .settings-title {
-  color: #eff4ff;
+  color: #8a96b5;
   font-weight: 600;
   font-size: 1rem;
 }
@@ -1363,7 +1363,7 @@ textarea:focus {
   padding: 0.5rem 1rem;
   border: 1px solid rgba(138, 161, 197, 0.28);
   background: rgba(93, 111, 139, 0.24);
-  color: #e5eeff;
+  color: #919db7;
   text-decoration: none;
   border-radius: 6px;
   font-size: 0.85rem;
@@ -1481,7 +1481,7 @@ textarea:focus {
   padding: 0.35rem;
   border: 1px solid rgba(138, 161, 197, 0.28);
   background: rgba(93, 111, 139, 0.24);
-  color: #e5eeff;
+  color: #919db7;
   border-radius: 4px;
   font-size: 0.85rem;
   text-align: center;
@@ -1568,7 +1568,7 @@ textarea:focus {
   padding: 0.75rem 1.25rem;
   border: 1px solid rgba(138, 161, 197, 0.28);
   background: rgba(93, 111, 139, 0.24);
-  color: #e5eeff;
+  color: #919db7;
   border-radius: 8px;
   cursor: pointer;
   font-size: 0.95rem;
@@ -1582,7 +1582,7 @@ textarea:focus {
 }
 
 .theme-toggle-text {
-  color: #e5eeff;
+  color: #919db7;
 }
 
 .theme-toggle-switch {
@@ -1671,7 +1671,7 @@ textarea:focus {
 [data-theme="light"] .toast-msg,
 [data-theme="light"] .history-meta,
 [data-theme="light"] .shop-history-hint {
-  color: #374151; /* darker than before */
+  color: #374151;
 }
 
 [data-theme="light"] input[type="text"],
@@ -1750,8 +1750,32 @@ textarea:focus {
   color: #6b7280;
 }
 
+[data-theme="light"] .settings-title {
+  color: #03045e;
+}
+
+[data-theme="light"] .comment-toggle,
+[data-theme="light"] .updates-toggle {
+  background-color: #f1f5f9;
+  color: #03045e;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+[data-theme="light"] .comment-toggle:hover,
+[data-theme="light"] .updates-toggle:hover {
+  background-color: #e5e9f0;
+}
+
 [data-theme="light"] .points-label {
   color: #6b7280;
+}
+
+[data-theme="light"] .points-box h3 {
+  color: #03045e !important;
+}
+
+[data-theme="light"] .points-box p {
+  color: #03045e !important;
 }
 
 [data-theme="light"] .points-value {
@@ -1841,6 +1865,17 @@ textarea:focus {
 
 [data-theme="light"] .theme-toggle-text {
   color: #03045e;
+}
+
+[data-theme="light"] .settings-link-btn {
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  background: rgba(249, 250, 251, 1);
+  color: #03045e;
+}
+
+[data-theme="light"] .settings-link-btn:hover {
+  background: rgba(244, 245, 247, 1);
+  border-color: rgba(0, 0, 0, 0.15);
 }
 
 [data-theme="light"] .post-owner {
